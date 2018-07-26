@@ -9,7 +9,7 @@ WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
 the specific language governing rights and limitations under the License.
 
 Code template generated with SynGen.
-The original code is: D:\usr\SynEdit-master\SynGen\SynHighlighterURQ.pas, released 2018-07-26.
+The original code is: D:\dev\github-synedit-urql-git\Component\SynHighlighterURQL.pas, released 2018-07-26.
 Description: Syntax Parser/Highlighter
 The initial author of this file is Apromix.
 Copyright (c) 2018, all rights reserved.
@@ -34,7 +34,7 @@ located at http://SynEdit.SourceForge.net
 
 -------------------------------------------------------------------------------}
 
-{$IFNDEF QSYNHIGHLIGHTERURQ}
+{$IFNDEF QSYNHIGHLIGHTERURQL}
 unit SynHighlighterURQL;
 {$ENDIF}
 
@@ -68,7 +68,7 @@ type
     tkTest,
     tkUnknown);
 
-  TRangeState = (rsUnKnown, rsBraceComment, rsCStyleComment, rsString);
+  TRangeState = (rsUnKnown, rsBeginLocation, rsLineComment, rsMultiLineComment, rsString);
 
   TProcTableProc = procedure of object;
 
@@ -80,7 +80,7 @@ type
   private
     fRange: TRangeState;
     fTokenID: TtkTokenKind;
-    fIdentFuncTable: array[0..4] of TIdentFuncTableFunc;
+    fIdentFuncTable: array[0..30] of TIdentFuncTableFunc;
     fCommentAttri: TSynHighlighterAttributes;
     fIdentifierAttri: TSynHighlighterAttributes;
     fKeyAttri: TSynHighlighterAttributes;
@@ -88,11 +88,29 @@ type
     fStringAttri: TSynHighlighterAttributes;
     fTestAttri: TSynHighlighterAttributes;
     function HashKey(Str: PWideChar): Cardinal;
+    function FuncAnd(Index: Integer): TtkTokenKind;
     function FuncBtn(Index: Integer): TtkTokenKind;
     function FuncCls(Index: Integer): TtkTokenKind;
+    function FuncClsb(Index: Integer): TtkTokenKind;
+    function FuncElse(Index: Integer): TtkTokenKind;
+    function FuncEnd(Index: Integer): TtkTokenKind;
+    function FuncGoto(Index: Integer): TtkTokenKind;
+    function FuncIf(Index: Integer): TtkTokenKind;
+    function FuncInclude(Index: Integer): TtkTokenKind;
+    function FuncInput(Index: Integer): TtkTokenKind;
+    function FuncInstr(Index: Integer): TtkTokenKind;
+    function FuncInv(Index: Integer): TtkTokenKind;
+    function FuncInvkill(Index: Integer): TtkTokenKind;
+    function FuncMusic(Index: Integer): TtkTokenKind;
+    function FuncNot(Index: Integer): TtkTokenKind;
+    function FuncOr(Index: Integer): TtkTokenKind;
     function FuncP(Index: Integer): TtkTokenKind;
+    function FuncPause(Index: Integer): TtkTokenKind;
+    function FuncPerkill(Index: Integer): TtkTokenKind;
     function FuncPln(Index: Integer): TtkTokenKind;
-    function FuncSynedit(Index: Integer): TtkTokenKind;
+    function FuncProc(Index: Integer): TtkTokenKind;
+    function FuncQuit(Index: Integer): TtkTokenKind;
+    function FuncThen(Index: Integer): TtkTokenKind;
     procedure IdentProc;
     procedure UnknownProc;
     function AltFunc(Index: Integer): TtkTokenKind;
@@ -102,10 +120,12 @@ type
     procedure SpaceProc;
     procedure CRProc;
     procedure LFProc;
-    procedure BraceCommentOpenProc;
-    procedure BraceCommentProc;
-    procedure CStyleCommentOpenProc;
-    procedure CStyleCommentProc;
+    procedure BeginLocationOpenProc;
+    procedure BeginLocationProc;
+    procedure LineCommentOpenProc;
+    procedure LineCommentProc;
+    procedure MultiLineCommentOpenProc;
+    procedure MultiLineCommentProc;
     procedure StringOpenProc;
     procedure StringProc;
   protected
@@ -135,9 +155,6 @@ type
     property TestAttri: TSynHighlighterAttributes read fTestAttri write fTestAttri;
   end;
 
-
-procedure Register;
-
 implementation
 
 uses
@@ -147,13 +164,8 @@ uses
   SynEditStrConst;
 {$ENDIF}
 
-procedure Register;
-begin
- RegisterComponents('SynEdit Highlighters', [TSynURQLSyn]);
-end;
-
 resourcestring
-  SYNS_FilterURQL = 'Quest files (qst.*)|*.qst';
+  SYNS_FilterURQL = 'Quest files (*.qst)|*.qst';
   SYNS_LangURQL = 'URQL';
   SYNS_FriendlyLangURQL = 'URQL';
   SYNS_AttrTest = 'Test';
@@ -161,12 +173,15 @@ resourcestring
 
 const
   // as this language is case-insensitive keywords *must* be in lowercase
-  KeyWords: array[0..4] of UnicodeString = (
-    'btn', 'cls', 'p', 'pln', 'synedit' 
+  KeyWords: array[0..22] of UnicodeString = (
+    'and', 'btn', 'cls', 'clsb', 'else', 'end', 'goto', 'if', 'include', 
+    'input', 'instr', 'inv', 'invkill', 'music', 'not', 'or', 'p', 'pause', 
+    'perkill', 'pln', 'proc', 'quit', 'then' 
   );
 
-  KeyIndices: array[0..4] of Integer = (
-    3, 0, 1, 2, 4 
+  KeyIndices: array[0..30] of Integer = (
+    2, 11, -1, 0, 1, 4, 5, 3, 14, -1, -1, 17, 9, 12, 7, 8, 6, -1, 19, 18, 20, 
+    -1, 21, -1, 22, -1, 16, -1, 15, 13, 10 
   );
 
 procedure TSynURQLSyn.InitIdent;
@@ -177,11 +192,29 @@ begin
     if KeyIndices[i] = -1 then
       fIdentFuncTable[i] := AltFunc;
 
-  fIdentFuncTable[1] := FuncBtn;
-  fIdentFuncTable[2] := FuncCls;
-  fIdentFuncTable[3] := FuncP;
-  fIdentFuncTable[0] := FuncPln;
-  fIdentFuncTable[4] := FuncSynedit;
+  fIdentFuncTable[3] := FuncAnd;
+  fIdentFuncTable[4] := FuncBtn;
+  fIdentFuncTable[0] := FuncCls;
+  fIdentFuncTable[7] := FuncClsb;
+  fIdentFuncTable[5] := FuncElse;
+  fIdentFuncTable[6] := FuncEnd;
+  fIdentFuncTable[16] := FuncGoto;
+  fIdentFuncTable[14] := FuncIf;
+  fIdentFuncTable[15] := FuncInclude;
+  fIdentFuncTable[12] := FuncInput;
+  fIdentFuncTable[30] := FuncInstr;
+  fIdentFuncTable[1] := FuncInv;
+  fIdentFuncTable[13] := FuncInvkill;
+  fIdentFuncTable[29] := FuncMusic;
+  fIdentFuncTable[8] := FuncNot;
+  fIdentFuncTable[28] := FuncOr;
+  fIdentFuncTable[26] := FuncP;
+  fIdentFuncTable[11] := FuncPause;
+  fIdentFuncTable[19] := FuncPerkill;
+  fIdentFuncTable[18] := FuncPln;
+  fIdentFuncTable[20] := FuncProc;
+  fIdentFuncTable[22] := FuncQuit;
+  fIdentFuncTable[24] := FuncThen;
 end;
 
 {$Q-}
@@ -190,13 +223,21 @@ begin
   Result := 0;
   while IsIdentChar(Str^) do
   begin
-    Result := Result * 997 + Ord(Str^) * 44;
+    Result := Result * 977 + Ord(Str^) * 3;
     inc(Str);
   end;
-  Result := Result mod 5;
+  Result := Result mod 31;
   fStringLen := Str - fToIdent;
 end;
 {$Q+}
+
+function TSynURQLSyn.FuncAnd(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
 
 function TSynURQLSyn.FuncBtn(Index: Integer): TtkTokenKind;
 begin
@@ -214,7 +255,127 @@ begin
     Result := tkIdentifier;
 end;
 
+function TSynURQLSyn.FuncClsb(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncElse(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncEnd(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncGoto(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncIf(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncInclude(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncInput(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncInstr(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncInv(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncInvkill(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncMusic(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncNot(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncOr(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
 function TSynURQLSyn.FuncP(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncPause(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncPerkill(Index: Integer): TtkTokenKind;
 begin
   if IsCurrentToken(KeyWords[Index]) then
     Result := tkKey
@@ -230,10 +391,26 @@ begin
     Result := tkIdentifier;
 end;
 
-function TSynURQLSyn.FuncSynedit(Index: Integer): TtkTokenKind;
+function TSynURQLSyn.FuncProc(Index: Integer): TtkTokenKind;
 begin
   if IsCurrentToken(KeyWords[Index]) then
-    Result := tkTest
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncQuit(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
+  else
+    Result := tkIdentifier;
+end;
+
+function TSynURQLSyn.FuncThen(Index: Integer): TtkTokenKind;
+begin
+  if IsCurrentToken(KeyWords[Index]) then
+    Result := tkKey
   else
     Result := tkIdentifier;
 end;
@@ -282,50 +459,66 @@ begin
   inc(Run);
 end;
 
-procedure TSynURQLSyn.BraceCommentOpenProc;
+procedure TSynURQLSyn.BeginLocationOpenProc;
 begin
   Inc(Run);
-  fRange := rsBraceComment;
+  fRange := rsBeginLocation;
+  BeginLocationProc;
+  fTokenID := tkKey;
+end;
+
+procedure TSynURQLSyn.BeginLocationProc;
+begin
+  fTokenID := tkKey;
+  repeat
+    if (fLine[Run] = ':') then
+    begin
+      Inc(Run, 1);
+      fRange := rsUnKnown;
+      Break;
+    end;
+    if not IsLineEnd(Run) then
+      Inc(Run);
+  until IsLineEnd(Run);
+end;
+
+procedure TSynURQLSyn.LineCommentOpenProc;
+begin
+  Inc(Run);
+  fRange := rsLineComment;
+  LineCommentProc;
   fTokenID := tkComment;
 end;
 
-procedure TSynURQLSyn.BraceCommentProc;
+procedure TSynURQLSyn.LineCommentProc;
 begin
-  case fLine[Run] of
-     #0: NullProc;
-    #10: LFProc;
-    #13: CRProc;
-  else
+  fTokenID := tkComment;
+  repeat
+    if (fLine[Run] = ';') then
     begin
-      fTokenID := tkComment;
-      repeat
-        if (fLine[Run] = '}') then
-        begin
-          Inc(Run, 1);
-          fRange := rsUnKnown;
-          Break;
-        end;
-        if not IsLineEnd(Run) then
-          Inc(Run);
-      until IsLineEnd(Run);
+      Inc(Run, 1);
+      fRange := rsUnKnown;
+      Break;
     end;
-  end;
+    if not IsLineEnd(Run) then
+      Inc(Run);
+  until IsLineEnd(Run);
 end;
 
-procedure TSynURQLSyn.CStyleCommentOpenProc;
+procedure TSynURQLSyn.MultiLineCommentOpenProc;
 begin
   Inc(Run);
   if (fLine[Run] = '*') then
   begin
     Inc(Run, 1);
-    fRange := rsCStyleComment;
+    fRange := rsMultiLineComment;
     fTokenID := tkComment;
   end
   else
     fTokenID := tkIdentifier;
 end;
 
-procedure TSynURQLSyn.CStyleCommentProc;
+procedure TSynURQLSyn.MultiLineCommentProc;
 begin
   case fLine[Run] of
      #0: NullProc;
@@ -411,7 +604,7 @@ end;
 procedure TSynURQLSyn.IdentProc;
 begin
   fTokenID := IdentKind(fLine + Run);
-  inc(Run, fStringLen);
+  Inc(Run, fStringLen);
   while IsIdentChar(fLine[Run]) do
     Inc(Run);
 end;
@@ -426,15 +619,15 @@ procedure TSynURQLSyn.Next;
 begin
   fTokenPos := Run;
   case fRange of
-    rsBraceComment: BraceCommentProc;
-    rsCStyleComment: CStyleCommentProc;
+    rsMultiLineComment: MultiLineCommentProc;
   else
     case fLine[Run] of
       #0: NullProc;
       #10: LFProc;
       #13: CRProc;
-      '{': BraceCommentOpenProc;
-      '/': CStyleCommentOpenProc;
+      ':': BeginLocationOpenProc;
+      ';': LineCommentOpenProc;
+      '/': MultiLineCommentOpenProc;
       '"': StringOpenProc;
       #1..#9, #11, #12, #14..#32: SpaceProc;
       'A'..'Z', 'a'..'z', '_': IdentProc;
@@ -466,7 +659,8 @@ end;
 function TSynURQLSyn.GetKeyWords(TokenKind: Integer): UnicodeString;
 begin
   Result := 
-    'btn,cls,p,pln,SynEdit';
+    'and,btn,cls,clsb,else,end,goto,if,include,input,instr,inv,invkill,mus' +
+    'ic,not,or,p,pause,perkill,pln,proc,quit,then';
 end;
 
 function TSynURQLSyn.GetTokenID: TtkTokenKind;
@@ -507,13 +701,8 @@ end;
 function TSynURQLSyn.GetSampleSource: UnicodeString;
 begin
   Result := 
-    '{ Sample source for the demo highlighter }'#13#10 +
-    #13#10 +
-    'This highlighter will recognize the words Hello and'#13#10 +
-    'World as keywords. It will also highlight "Strings".'#13#10 +
-    #13#10 +
-    'And a special keyword type: SynEdit'#13#10 +
-    '/* This style of comments is also highlighted */';
+    'Sample source for: '#13#10 +
+    'Syntax Parser/Highlighter';
 end;
 
 function TSynURQLSyn.IsFilterStored: Boolean;

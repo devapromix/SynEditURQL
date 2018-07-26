@@ -1,4 +1,4 @@
-TSynURQLSyn   {first Identifier is considered to be the Class Name }
+TSynURQLSyn
 tk              {second Identifier is considered to be the Identifier Prefix }
 IdentStart '_', 'a'..'z', 'A'..'Z':: '_', '0'..'9', 'a'..'z', 'A'..'Z'::
 
@@ -16,10 +16,25 @@ p
 pln
 btn
 cls
-|><|
-
-KEYS Test
-SynEdit
+clsb
+end
+perkill
+invkill
+pause
+input
+music
+include
+or
+and
+not
+quit
+if
+then
+else
+goto
+proc
+instr
+inv
 |><|
 
 CHARS
@@ -27,7 +42,7 @@ CHARS
 'A'..'Z', 'a'..'z', '_':: Ident
 BeginProc
   fTokenID := IdentKind(fLine + Run);
-  inc(Run, fStringLen);
+  Inc(Run, fStringLen);
   while IsIdentChar(fLine[Run]) do
     Inc(Run);
 EndProc
@@ -36,20 +51,10 @@ EndProc
 
 ENCLOSEDBY
 
-Comment,BraceComment,{,},MultiLine
-Comment,CStyleComment,/*,*/,MultiLine
+Key,BeginLocation,:,:
+Comment,LineComment,;,;
+Comment,MultiLineComment,/*,*/,MultiLine
 String,String,","
 
-|><|
-
-SAMPLESOURCE
-{ Sample source for the demo highlighter }
-
-This highlighter will recognize the words Hello and
-World as keywords. It will also highlight "Strings".
-
-And a special keyword type: SynEdit
-
-/* This style of comments is also highlighted */
 |><|
 
