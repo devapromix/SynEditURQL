@@ -1,43 +1,42 @@
-{-------------------------------------------------------------------------------
-The contents of this file are subject to the Mozilla Public License
-Version 1.1 (the "License"); you may not use this file except in compliance
-with the License. You may obtain a copy of the License at
-http://www.mozilla.org/MPL/
+{ -------------------------------------------------------------------------------
+  The contents of this file are subject to the Mozilla Public License
+  Version 1.1 (the "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+  http://www.mozilla.org/MPL/
 
-Software distributed under the License is distributed on an "AS IS" basis,
-WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
-the specific language governing rights and limitations under the License.
+  Software distributed under the License is distributed on an "AS IS" basis,
+  WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
+  the specific language governing rights and limitations under the License.
 
-Code template generated with SynGen.
-The original code is: D:\dev\github-synedit-urql-git\Component\SynHighlighterURQL.pas, released 2018-07-26.
-Description: Syntax Parser/Highlighter
-The initial author of this file is Apromix.
-Copyright (c) 2018, all rights reserved.
+  Code template generated with SynGen.
+  The original code is: D:\dev\github-synedit-urql-git\Component\SynHighlighterURQL.pas, released 2018-07-26.
+  Description: Syntax Parser/Highlighter
+  The initial author of this file is Apromix.
+  Copyright (c) 2018, all rights reserved.
 
-Contributors to the SynEdit and mwEdit projects are listed in the
-Contributors.txt file.
+  Contributors to the SynEdit and mwEdit projects are listed in the
+  Contributors.txt file.
 
-Alternatively, the contents of this file may be used under the terms of the
-GNU General Public License Version 2 or later (the "GPL"), in which case
-the provisions of the GPL are applicable instead of those above.
-If you wish to allow use of your version of this file only under the terms
-of the GPL and not to allow others to use your version of this file
-under the MPL, indicate your decision by deleting the provisions above and
-replace them with the notice and other provisions required by the GPL.
-If you do not delete the provisions above, a recipient may use your version
-of this file under either the MPL or the GPL.
+  Alternatively, the contents of this file may be used under the terms of the
+  GNU General Public License Version 2 or later (the "GPL"), in which case
+  the provisions of the GPL are applicable instead of those above.
+  If you wish to allow use of your version of this file only under the terms
+  of the GPL and not to allow others to use your version of this file
+  under the MPL, indicate your decision by deleting the provisions above and
+  replace them with the notice and other provisions required by the GPL.
+  If you do not delete the provisions above, a recipient may use your version
+  of this file under either the MPL or the GPL.
 
-$Id: $
+  $Id: $
 
-You may retrieve the latest version of this file at the SynEdit home page,
-located at http://SynEdit.SourceForge.net
+  You may retrieve the latest version of this file at the SynEdit home page,
+  located at http://SynEdit.SourceForge.net
 
--------------------------------------------------------------------------------}
+  ------------------------------------------------------------------------------- }
 
 {$IFNDEF QSYNHIGHLIGHTERURQL}
 unit SynHighlighterURQL;
 {$ENDIF}
-
 {$I SynEdit.inc}
 
 interface
@@ -58,29 +57,23 @@ uses
   Classes;
 
 type
-  TtkTokenKind = (
-    tkComment,
-    tkIdentifier,
-    tkKey,
-    tkNull,
-    tkSpace,
-    tkString,
-    tkTest,
-    tkUnknown);
+  TtkTokenKind = (tkComment, tkIdentifier, tkKey, tkNull, tkSpace, tkString,
+    tkTest, tkUnknown);
 
-  TRangeState = (rsUnKnown, rsBeginLocation, rsLineComment, rsMultiLineComment, rsString);
+  TRangeState = (rsUnKnown, rsBeginLocation, rsLineComment, rsMultiLineComment,
+    rsString);
 
   TProcTableProc = procedure of object;
 
   PIdentFuncTableFunc = ^TIdentFuncTableFunc;
-  TIdentFuncTableFunc = function (Index: Integer): TtkTokenKind of object;
+  TIdentFuncTableFunc = function(Index: Integer): TtkTokenKind of object;
 
 type
   TSynURQLSyn = class(TSynCustomHighlighter)
   private
     fRange: TRangeState;
     fTokenID: TtkTokenKind;
-    fIdentFuncTable: array[0..30] of TIdentFuncTableFunc;
+    fIdentFuncTable: array [0 .. 30] of TIdentFuncTableFunc;
     fCommentAttri: TSynHighlighterAttributes;
     fIdentifierAttri: TSynHighlighterAttributes;
     fKeyAttri: TSynHighlighterAttributes;
@@ -138,7 +131,8 @@ type
     function GetRange: Pointer; override;
     procedure ResetRange; override;
     procedure SetRange(Value: Pointer); override;
-    function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
+    function GetDefaultAttribute(Index: Integer)
+      : TSynHighlighterAttributes; override;
     function GetEol: Boolean; override;
     function GetKeyWords(TokenKind: Integer): UnicodeString; override;
     function GetTokenID: TtkTokenKind;
@@ -147,13 +141,20 @@ type
     function IsIdentChar(AChar: WideChar): Boolean; override;
     procedure Next; override;
   published
-    property CommentAttri: TSynHighlighterAttributes read fCommentAttri write fCommentAttri;
-    property IdentifierAttri: TSynHighlighterAttributes read fIdentifierAttri write fIdentifierAttri;
+    property CommentAttri: TSynHighlighterAttributes read fCommentAttri
+      write fCommentAttri;
+    property IdentifierAttri: TSynHighlighterAttributes read fIdentifierAttri
+      write fIdentifierAttri;
     property KeyAttri: TSynHighlighterAttributes read fKeyAttri write fKeyAttri;
-    property SpaceAttri: TSynHighlighterAttributes read fSpaceAttri write fSpaceAttri;
-    property StringAttri: TSynHighlighterAttributes read fStringAttri write fStringAttri;
-    property TestAttri: TSynHighlighterAttributes read fTestAttri write fTestAttri;
+    property SpaceAttri: TSynHighlighterAttributes read fSpaceAttri
+      write fSpaceAttri;
+    property StringAttri: TSynHighlighterAttributes read fStringAttri
+      write fStringAttri;
+    property TestAttri: TSynHighlighterAttributes read fTestAttri
+      write fTestAttri;
   end;
+
+procedure Register;
 
 implementation
 
@@ -164,6 +165,11 @@ uses
   SynEditStrConst;
 {$ENDIF}
 
+procedure Register;
+begin
+  RegisterComponents('SynEdit Highlighters', [TSynURQLSyn]);
+end;
+
 resourcestring
   SYNS_FilterURQL = 'Quest files (*.qst)|*.qst';
   SYNS_LangURQL = 'URQL';
@@ -173,16 +179,14 @@ resourcestring
 
 const
   // as this language is case-insensitive keywords *must* be in lowercase
-  KeyWords: array[0..22] of UnicodeString = (
-    'and', 'btn', 'cls', 'clsb', 'else', 'end', 'goto', 'if', 'include', 
-    'input', 'instr', 'inv', 'invkill', 'music', 'not', 'or', 'p', 'pause', 
-    'perkill', 'pln', 'proc', 'quit', 'then' 
-  );
+  KeyWords: array [0 .. 22] of UnicodeString = ('and', 'btn', 'cls', 'clsb',
+    'else', 'end', 'goto', 'if', 'include', 'input', 'instr', 'inv', 'invkill',
+    'music', 'not', 'or', 'p', 'pause', 'perkill', 'pln', 'proc',
+    'quit', 'then');
 
-  KeyIndices: array[0..30] of Integer = (
-    2, 11, -1, 0, 1, 4, 5, 3, 14, -1, -1, 17, 9, 12, 7, 8, 6, -1, 19, 18, 20, 
-    -1, 21, -1, 22, -1, 16, -1, 15, 13, 10 
-  );
+  KeyIndices: array [0 .. 30] of Integer = (2, 11, -1, 0, 1, 4, 5, 3, 14, -1,
+    -1, 17, 9, 12, 7, 8, 6, -1, 19, 18, 20, -1, 21, -1, 22, -1, 16, -1,
+    15, 13, 10);
 
 procedure TSynURQLSyn.InitIdent;
 var
@@ -218,6 +222,7 @@ begin
 end;
 
 {$Q-}
+
 function TSynURQLSyn.HashKey(Str: PWideChar): Cardinal;
 begin
   Result := 0;
@@ -436,7 +441,8 @@ procedure TSynURQLSyn.SpaceProc;
 begin
   inc(Run);
   fTokenID := tkSpace;
-  while (FLine[Run] <= #32) and not IsLineEnd(Run) do inc(Run);
+  while (FLine[Run] <= #32) and not IsLineEnd(Run) do
+    inc(Run);
 end;
 
 procedure TSynURQLSyn.NullProc;
@@ -449,7 +455,7 @@ procedure TSynURQLSyn.CRProc;
 begin
   fTokenID := tkSpace;
   inc(Run);
-  if fLine[Run] = #10 then
+  if FLine[Run] = #10 then
     inc(Run);
 end;
 
@@ -461,7 +467,7 @@ end;
 
 procedure TSynURQLSyn.BeginLocationOpenProc;
 begin
-  Inc(Run);
+  inc(Run);
   fRange := rsBeginLocation;
   BeginLocationProc;
   fTokenID := tkKey;
@@ -471,20 +477,16 @@ procedure TSynURQLSyn.BeginLocationProc;
 begin
   fTokenID := tkKey;
   repeat
-    if (fLine[Run] = ':') then
-    begin
-      Inc(Run, 1);
-      fRange := rsUnKnown;
+    if (FLine[Run] = ':') then
       Break;
-    end;
     if not IsLineEnd(Run) then
-      Inc(Run);
+      inc(Run);
   until IsLineEnd(Run);
 end;
 
 procedure TSynURQLSyn.LineCommentOpenProc;
 begin
-  Inc(Run);
+  inc(Run);
   fRange := rsLineComment;
   LineCommentProc;
   fTokenID := tkComment;
@@ -494,23 +496,19 @@ procedure TSynURQLSyn.LineCommentProc;
 begin
   fTokenID := tkComment;
   repeat
-    if (fLine[Run] = ';') then
-    begin
-      Inc(Run, 1);
-      fRange := rsUnKnown;
+    if (FLine[Run] = ';') then
       Break;
-    end;
     if not IsLineEnd(Run) then
-      Inc(Run);
+      inc(Run);
   until IsLineEnd(Run);
 end;
 
 procedure TSynURQLSyn.MultiLineCommentOpenProc;
 begin
-  Inc(Run);
-  if (fLine[Run] = '*') then
+  inc(Run);
+  if (FLine[Run] = '*') then
   begin
-    Inc(Run, 1);
+    inc(Run, 1);
     fRange := rsMultiLineComment;
     fTokenID := tkComment;
   end
@@ -520,23 +518,25 @@ end;
 
 procedure TSynURQLSyn.MultiLineCommentProc;
 begin
-  case fLine[Run] of
-     #0: NullProc;
-    #10: LFProc;
-    #13: CRProc;
+  case FLine[Run] of
+    #0:
+      NullProc;
+    #10:
+      LFProc;
+    #13:
+      CRProc;
   else
     begin
       fTokenID := tkComment;
       repeat
-        if (fLine[Run] = '*') and
-           (fLine[Run + 1] = '/') then
+        if (FLine[Run] = '*') and (FLine[Run + 1] = '/') then
         begin
-          Inc(Run, 2);
+          inc(Run, 2);
           fRange := rsUnKnown;
           Break;
         end;
         if not IsLineEnd(Run) then
-          Inc(Run);
+          inc(Run);
       until IsLineEnd(Run);
     end;
   end;
@@ -544,7 +544,7 @@ end;
 
 procedure TSynURQLSyn.StringOpenProc;
 begin
-  Inc(Run);
+  inc(Run);
   fRange := rsString;
   StringProc;
   fTokenID := tkString;
@@ -554,14 +554,14 @@ procedure TSynURQLSyn.StringProc;
 begin
   fTokenID := tkString;
   repeat
-    if (fLine[Run] = '"') then
+    if (FLine[Run] = '"') then
     begin
-      Inc(Run, 1);
+      inc(Run, 1);
       fRange := rsUnKnown;
       Break;
     end;
     if not IsLineEnd(Run) then
-      Inc(Run);
+      inc(Run);
   until IsLineEnd(Run);
 end;
 
@@ -570,26 +570,32 @@ begin
   inherited Create(AOwner);
   fCaseSensitive := False;
 
-  fCommentAttri := TSynHighLighterAttributes.Create(SYNS_AttrComment, SYNS_FriendlyAttrComment);
+  fCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrComment,
+    SYNS_FriendlyAttrComment);
   fCommentAttri.Style := [fsItalic];
   fCommentAttri.Foreground := clNavy;
   AddAttribute(fCommentAttri);
 
-  fIdentifierAttri := TSynHighLighterAttributes.Create(SYNS_AttrIdentifier, SYNS_FriendlyAttrIdentifier);
+  fIdentifierAttri := TSynHighlighterAttributes.Create(SYNS_AttrIdentifier,
+    SYNS_FriendlyAttrIdentifier);
   AddAttribute(fIdentifierAttri);
 
-  fKeyAttri := TSynHighLighterAttributes.Create(SYNS_AttrReservedWord, SYNS_FriendlyAttrReservedWord);
+  fKeyAttri := TSynHighlighterAttributes.Create(SYNS_AttrReservedWord,
+    SYNS_FriendlyAttrReservedWord);
   fKeyAttri.Style := [fsBold];
   AddAttribute(fKeyAttri);
 
-  fSpaceAttri := TSynHighLighterAttributes.Create(SYNS_AttrSpace, SYNS_FriendlyAttrSpace);
+  fSpaceAttri := TSynHighlighterAttributes.Create(SYNS_AttrSpace,
+    SYNS_FriendlyAttrSpace);
   AddAttribute(fSpaceAttri);
 
-  fStringAttri := TSynHighLighterAttributes.Create(SYNS_AttrString, SYNS_FriendlyAttrString);
+  fStringAttri := TSynHighlighterAttributes.Create(SYNS_AttrString,
+    SYNS_FriendlyAttrString);
   fStringAttri.Foreground := clRed;
   AddAttribute(fStringAttri);
 
-  fTestAttri := TSynHighLighterAttributes.Create(SYNS_AttrTest, SYNS_FriendlyAttrTest);
+  fTestAttri := TSynHighlighterAttributes.Create(SYNS_AttrTest,
+    SYNS_FriendlyAttrTest);
   fTestAttri.Style := [fsUnderline, fsItalic];
   fTestAttri.Foreground := clBlue;
   fTestAttri.Background := clSilver;
@@ -598,15 +604,15 @@ begin
   SetAttributesOnChange(DefHighlightChange);
   InitIdent;
   fDefaultFilter := SYNS_FilterURQL;
-  fRange := rsUnknown;
+  fRange := rsUnKnown;
 end;
 
 procedure TSynURQLSyn.IdentProc;
 begin
-  fTokenID := IdentKind(fLine + Run);
-  Inc(Run, fStringLen);
-  while IsIdentChar(fLine[Run]) do
-    Inc(Run);
+  fTokenID := IdentKind(FLine + Run);
+  inc(Run, fStringLen);
+  while IsIdentChar(FLine[Run]) do
+    inc(Run);
 end;
 
 procedure TSynURQLSyn.UnknownProc;
@@ -619,18 +625,28 @@ procedure TSynURQLSyn.Next;
 begin
   fTokenPos := Run;
   case fRange of
-    rsMultiLineComment: MultiLineCommentProc;
+    rsMultiLineComment:
+      MultiLineCommentProc;
   else
-    case fLine[Run] of
-      #0: NullProc;
-      #10: LFProc;
-      #13: CRProc;
-      ':': BeginLocationOpenProc;
-      ';': LineCommentOpenProc;
-      '/': MultiLineCommentOpenProc;
-      '"': StringOpenProc;
-      #1..#9, #11, #12, #14..#32: SpaceProc;
-      'A'..'Z', 'a'..'z', '_': IdentProc;
+    case FLine[Run] of
+      #0:
+        NullProc;
+      #10:
+        LFProc;
+      #13:
+        CRProc;
+      ':':
+        BeginLocationOpenProc;
+      ';':
+        LineCommentOpenProc;
+      '/':
+        MultiLineCommentOpenProc;
+      '"':
+        StringOpenProc;
+      #1 .. #9, #11, #12, #14 .. #32:
+        SpaceProc;
+      'A' .. 'Z', 'a' .. 'z', '_':
+        IdentProc;
     else
       UnknownProc;
     end;
@@ -638,14 +654,20 @@ begin
   inherited;
 end;
 
-function TSynURQLSyn.GetDefaultAttribute(Index: Integer): TSynHighLighterAttributes;
+function TSynURQLSyn.GetDefaultAttribute(Index: Integer)
+  : TSynHighlighterAttributes;
 begin
   case Index of
-    SYN_ATTR_COMMENT: Result := fCommentAttri;
-    SYN_ATTR_IDENTIFIER: Result := fIdentifierAttri;
-    SYN_ATTR_KEYWORD: Result := fKeyAttri;
-    SYN_ATTR_STRING: Result := fStringAttri;
-    SYN_ATTR_WHITESPACE: Result := fSpaceAttri;
+    SYN_ATTR_COMMENT:
+      Result := fCommentAttri;
+    SYN_ATTR_IDENTIFIER:
+      Result := fIdentifierAttri;
+    SYN_ATTR_KEYWORD:
+      Result := fKeyAttri;
+    SYN_ATTR_STRING:
+      Result := fStringAttri;
+    SYN_ATTR_WHITESPACE:
+      Result := fSpaceAttri;
   else
     Result := nil;
   end;
@@ -658,26 +680,32 @@ end;
 
 function TSynURQLSyn.GetKeyWords(TokenKind: Integer): UnicodeString;
 begin
-  Result := 
-    'and,btn,cls,clsb,else,end,goto,if,include,input,instr,inv,invkill,mus' +
-    'ic,not,or,p,pause,perkill,pln,proc,quit,then';
+  Result := 'and,btn,cls,clsb,else,end,goto,if,include,input,instr,inv,invkill,mus'
+    + 'ic,not,or,p,pause,perkill,pln,proc,quit,then';
 end;
 
 function TSynURQLSyn.GetTokenID: TtkTokenKind;
 begin
-  Result := fTokenId;
+  Result := fTokenID;
 end;
 
-function TSynURQLSyn.GetTokenAttribute: TSynHighLighterAttributes;
+function TSynURQLSyn.GetTokenAttribute: TSynHighlighterAttributes;
 begin
   case GetTokenID of
-    tkComment: Result := fCommentAttri;
-    tkIdentifier: Result := fIdentifierAttri;
-    tkKey: Result := fKeyAttri;
-    tkSpace: Result := fSpaceAttri;
-    tkString: Result := fStringAttri;
-    tkTest: Result := fTestAttri;
-    tkUnknown: Result := fIdentifierAttri;
+    tkComment:
+      Result := fCommentAttri;
+    tkIdentifier:
+      Result := fIdentifierAttri;
+    tkKey:
+      Result := fKeyAttri;
+    tkSpace:
+      Result := fSpaceAttri;
+    tkString:
+      Result := fStringAttri;
+    tkTest:
+      Result := fTestAttri;
+    tkUnknown:
+      Result := fIdentifierAttri;
   else
     Result := nil;
   end;
@@ -685,24 +713,22 @@ end;
 
 function TSynURQLSyn.GetTokenKind: Integer;
 begin
-  Result := Ord(fTokenId);
+  Result := Ord(fTokenID);
 end;
 
 function TSynURQLSyn.IsIdentChar(AChar: WideChar): Boolean;
 begin
   case AChar of
-    '_', '0'..'9', 'a'..'z', 'A'..'Z':
+    '_', '0' .. '9', 'a' .. 'z', 'A' .. 'Z':
       Result := True;
-    else
-      Result := False;
+  else
+    Result := False;
   end;
 end;
 
 function TSynURQLSyn.GetSampleSource: UnicodeString;
 begin
-  Result := 
-    'Sample source for: '#13#10 +
-    'Syntax Parser/Highlighter';
+  Result := 'Sample source for: '#13#10 + 'Syntax Parser/Highlighter';
 end;
 
 function TSynURQLSyn.IsFilterStored: Boolean;
@@ -722,7 +748,7 @@ end;
 
 procedure TSynURQLSyn.ResetRange;
 begin
-  fRange := rsUnknown;
+  fRange := rsUnKnown;
 end;
 
 procedure TSynURQLSyn.SetRange(Value: Pointer);
@@ -736,7 +762,9 @@ begin
 end;
 
 initialization
+
 {$IFNDEF SYN_CPPB_1}
   RegisterPlaceableHighlighter(TSynURQLSyn);
 {$ENDIF}
+
 end.
