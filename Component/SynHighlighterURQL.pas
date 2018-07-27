@@ -1,770 +1,768 @@
-{ -------------------------------------------------------------------------------
-  The contents of this file are subject to the Mozilla Public License
-  Version 1.1 (the "License"); you may not use this file except in compliance
-  with the License. You may obtain a copy of the License at
-  http://www.mozilla.org/MPL/
-
-  Software distributed under the License is distributed on an "AS IS" basis,
-  WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
-  the specific language governing rights and limitations under the License.
-
-  Code template generated with SynGen.
-  The original code is: D:\dev\github-synedit-urql-git\Component\SynHighlighterURQL.pas, released 2018-07-26.
-  Description: Syntax Parser/Highlighter
-  The initial author of this file is Apromix.
-  Copyright (c) 2018, all rights reserved.
-
-  Contributors to the SynEdit and mwEdit projects are listed in the
-  Contributors.txt file.
-
-  Alternatively, the contents of this file may be used under the terms of the
-  GNU General Public License Version 2 or later (the "GPL"), in which case
-  the provisions of the GPL are applicable instead of those above.
-  If you wish to allow use of your version of this file only under the terms
-  of the GPL and not to allow others to use your version of this file
-  under the MPL, indicate your decision by deleting the provisions above and
-  replace them with the notice and other provisions required by the GPL.
-  If you do not delete the provisions above, a recipient may use your version
-  of this file under either the MPL or the GPL.
-
-  $Id: $
-
-  You may retrieve the latest version of this file at the SynEdit home page,
-  located at http://SynEdit.SourceForge.net
-
-  ------------------------------------------------------------------------------- }
-
-{$IFNDEF QSYNHIGHLIGHTERURQL}
 unit SynHighlighterURQL;
-{$ENDIF}
-{$I SynEdit.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QGraphics,
-  QSynEditTypes,
-  QSynEditHighlighter,
-  QSynUnicode,
-{$ELSE}
   Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynUnicode,
-{$ENDIF}
   SysUtils,
   Classes;
 
 type
-  TtkTokenKind = (tkComment, tkIdentifier, tkKey, tkNull, tkSpace, tkString,
-    tkTest, tkUnknown);
-
-  TRangeState = (rsUnKnown, rsBeginLocation, rsLineComment, rsMultiLineComment,
-    rsString);
-
-  TProcTableProc = procedure of object;
-
-  PIdentFuncTableFunc = ^TIdentFuncTableFunc;
-  TIdentFuncTableFunc = function(Index: Integer): TtkTokenKind of object;
+  TTokenKind = (tkComment, tkIdentifier, tkKeyWord, tkString, tkNumber, tkSpace,
+    tkLabel, tkSymbol, tkOverLine, tkDecoratorType, tkSpecialVar, tkUnknown);
+  TRangeKind = (rkNull, rkGeneral, rkPlnText, rkString, rkSub,
+    rkMultilineComment);
 
 type
   TSynURQLSyn = class(TSynCustomHighlighter)
   private
-    fRange: TRangeState;
-    fTokenID: TtkTokenKind;
-    fIdentFuncTable: array [0 .. 30] of TIdentFuncTableFunc;
-    fCommentAttri: TSynHighlighterAttributes;
-    fIdentifierAttri: TSynHighlighterAttributes;
-    fKeyAttri: TSynHighlighterAttributes;
-    fSpaceAttri: TSynHighlighterAttributes;
-    fStringAttri: TSynHighlighterAttributes;
-    fTestAttri: TSynHighlighterAttributes;
-    function HashKey(Str: PWideChar): Cardinal;
-    function FuncAnd(Index: Integer): TtkTokenKind;
-    function FuncBtn(Index: Integer): TtkTokenKind;
-    function FuncCls(Index: Integer): TtkTokenKind;
-    function FuncClsb(Index: Integer): TtkTokenKind;
-    function FuncElse(Index: Integer): TtkTokenKind;
-    function FuncEnd(Index: Integer): TtkTokenKind;
-    function FuncGoto(Index: Integer): TtkTokenKind;
-    function FuncIf(Index: Integer): TtkTokenKind;
-    function FuncInclude(Index: Integer): TtkTokenKind;
-    function FuncInput(Index: Integer): TtkTokenKind;
-    function FuncInstr(Index: Integer): TtkTokenKind;
-    function FuncInv(Index: Integer): TtkTokenKind;
-    function FuncInvkill(Index: Integer): TtkTokenKind;
-    function FuncMusic(Index: Integer): TtkTokenKind;
-    function FuncNot(Index: Integer): TtkTokenKind;
-    function FuncOr(Index: Integer): TtkTokenKind;
-    function FuncP(Index: Integer): TtkTokenKind;
-    function FuncPause(Index: Integer): TtkTokenKind;
-    function FuncPerkill(Index: Integer): TtkTokenKind;
-    function FuncPln(Index: Integer): TtkTokenKind;
-    function FuncProc(Index: Integer): TtkTokenKind;
-    function FuncQuit(Index: Integer): TtkTokenKind;
-    function FuncThen(Index: Integer): TtkTokenKind;
-    procedure IdentProc;
-    procedure UnknownProc;
-    function AltFunc(Index: Integer): TtkTokenKind;
-    procedure InitIdent;
-    function IdentKind(MayBe: PWideChar): TtkTokenKind;
-    procedure NullProc;
-    procedure SpaceProc;
-    procedure CRProc;
-    procedure LFProc;
-    procedure BeginLocationOpenProc;
-    procedure BeginLocationProc;
-    procedure LineCommentOpenProc;
-    procedure LineCommentProc;
-    procedure MultiLineCommentOpenProc;
-    procedure MultiLineCommentProc;
-    procedure StringOpenProc;
-    procedure StringProc;
+    f_CurToken: TTokenKind;
+    f_CommentAttr: TSynHighlighterAttributes;
+    f_OverlineAttr: TSynHighlighterAttributes;
+    f_CurRange: TRangeKind;
+    f_NumberAttr: TSynHighlighterAttributes;
+    f_DefaultAttr: TSynHighlighterAttributes;
+    f_InDecoradd: Boolean;
+    f_ThenCount: Integer;
+    f_LabelAttr: TSynHighlighterAttributes;
+    f_SymbolAttr: TSynHighlighterAttributes;
+    f_KeyWordAttr: TSynHighlighterAttributes;
+    f_StringAttr: TSynHighlighterAttributes;
+    f_PlnTextAttr: TSynHighlighterAttributes;
+    f_RangeToSet: TRangeKind;
+    f_SubLevel: Integer;
+    f_RangeBeforeSub: TRangeKind;
+    f_RangeBeforeMLC: TRangeKind;
+    f_SpecialAttr: TSynHighlighterAttributes;
+    f_StringComma: WideChar;
+    f_SubLevel1Attr: TSynHighlighterAttributes;
+    f_SubLevel3Attr: TSynHighlighterAttributes;
+    f_SubLevel2Attr: TSynHighlighterAttributes;
+    function IsLabelChar(aChar: WideChar): Boolean;
+    procedure NewCodeLineStarted;
+    procedure TP_Ampersand;
+    procedure TP_Comma(aChar: WideChar);
+    procedure TP_LineComment;
+    procedure TP_Ident;
+    procedure TP_Label;
+    procedure TP_Minus;
+    procedure TP_MultilineComment;
+    procedure TP_Number;
+    procedure TP_Slash;
+    procedure TP_Space;
+    procedure TP_SubEnd;
+    procedure TP_SubStart;
+    procedure TP_Symbol;
+    procedure TP_Unknown;
   protected
-    function GetSampleSource: UnicodeString; override;
-    function IsFilterStored: Boolean; override;
+    function IsCurrentTokenStartsWith(const aPrefix: Unicodestring): Boolean;
+    function IsCurrentTokenEndsWith(const aSuffix: Unicodestring): Boolean;
+    function IsRndVar: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
-    class function GetFriendlyLanguageName: UnicodeString; override;
-    class function GetLanguageName: string; override;
-    function GetRange: Pointer; override;
-    procedure ResetRange; override;
-    procedure SetRange(Value: Pointer); override;
     function GetDefaultAttribute(Index: Integer)
       : TSynHighlighterAttributes; override;
     function GetEol: Boolean; override;
-    function GetKeyWords(TokenKind: Integer): UnicodeString; override;
-    function GetTokenID: TtkTokenKind;
+    class function GetFriendlyLanguageName: Unicodestring; override;
+    class function GetLanguageName: string; override;
+    function GetRange: Pointer; override;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
     function GetTokenKind: Integer; override;
-    function IsIdentChar(AChar: WideChar): Boolean; override;
+    function IsIdentChar(aChar: WideChar): Boolean; override;
     procedure Next; override;
+    procedure ResetRange; override;
+    procedure SetRange(Value: Pointer); override;
   published
-    property CommentAttri: TSynHighlighterAttributes read fCommentAttri
-      write fCommentAttri;
-    property IdentifierAttri: TSynHighlighterAttributes read fIdentifierAttri
-      write fIdentifierAttri;
-    property KeyAttri: TSynHighlighterAttributes read fKeyAttri write fKeyAttri;
-    property SpaceAttri: TSynHighlighterAttributes read fSpaceAttri
-      write fSpaceAttri;
-    property StringAttri: TSynHighlighterAttributes read fStringAttri
-      write fStringAttri;
-    property TestAttri: TSynHighlighterAttributes read fTestAttri
-      write fTestAttri;
+    property CommentAttr: TSynHighlighterAttributes read f_CommentAttr
+      write f_CommentAttr;
+    property OverlineAttr: TSynHighlighterAttributes read f_OverlineAttr
+      write f_OverlineAttr;
+    property NumberAttr: TSynHighlighterAttributes read f_NumberAttr
+      write f_NumberAttr;
+    property DefaultAttr: TSynHighlighterAttributes read f_DefaultAttr
+      write f_DefaultAttr;
+    property LabelAttr: TSynHighlighterAttributes read f_LabelAttr
+      write f_LabelAttr;
+    property SymbolAttr: TSynHighlighterAttributes read f_SymbolAttr
+      write f_SymbolAttr;
+    property KeyWordAttr: TSynHighlighterAttributes read f_KeyWordAttr
+      write f_KeyWordAttr;
+    property StringAttr: TSynHighlighterAttributes read f_StringAttr
+      write f_StringAttr;
+    property PlnTextAttr: TSynHighlighterAttributes read f_PlnTextAttr
+      write f_PlnTextAttr;
+    property SpecialAttr: TSynHighlighterAttributes read f_SpecialAttr
+      write f_SpecialAttr;
+    property SubLevel1Attr: TSynHighlighterAttributes read f_SubLevel1Attr
+      write f_SubLevel1Attr;
+    property SubLevel2Attr: TSynHighlighterAttributes read f_SubLevel2Attr
+      write f_SubLevel2Attr;
+    property SubLevel3Attr: TSynHighlighterAttributes read f_SubLevel3Attr
+      write f_SubLevel3Attr;
   end;
 
-procedure Register;
-
+procedure Register;  
+  
 implementation
-
-uses
-{$IFDEF SYN_CLX}
-  QSynEditStrConst;
-{$ELSE}
-  SynEditStrConst;
-{$ENDIF}
 
 procedure Register;
 begin
   RegisterComponents('SynEdit Highlighters', [TSynURQLSyn]);
 end;
 
-resourcestring
-  SYNS_FilterURQL = 'Quest files (*.qst)|*.qst';
-  SYNS_LangURQL = 'URQL';
-  SYNS_FriendlyLangURQL = 'URQL';
-  SYNS_AttrTest = 'Test';
-  SYNS_FriendlyAttrTest = 'Test';
+const
+  cURQFilter = 'URQ Quest File (*.qst)|*.qst';
+
+  cAttrName_Default = 'default';
+  cAttrName_Comment = 'comments';
+  cAttrName_Label = 'label';
+  cAttrName_Symbol = 'symbol';
+  cAttrName_Number = 'number';
+  cAttrName_Keyword = 'keyword';
+  cAttrName_Special = 'special';
+  cAttrName_PlnText = 'textout';
+  cAttrName_String = 'string';
+  cAttrName_Overline = 'overline';
+  cAttrName_SubLevel1 = 'substitute1';
+  cAttrName_SubLevel2 = 'substitute2';
+  cAttrName_SubLevel3 = 'substitute3';
+
+  cAttrFName_Default = 'Текст по умолчанию';
+  cAttrFName_Comment = 'Комментарии';
+  cAttrFName_Label = 'Метка';
+  cAttrFName_Symbol = 'Символ';
+  cAttrFName_Number = 'Число';
+  cAttrFName_Keyword = 'Ключевое слово';
+  cAttrFName_Special = 'Особые переменные и значения';
+  cAttrFName_PlnText = 'Выводимый текст';
+  cAttrFName_String = 'Строка';
+  cAttrFName_Overline = 'Перенос';
+  cAttrFName_SubLevel1 = 'Подстановка первого уровня';
+  cAttrFName_SubLevel2 = 'Подстановка второго уровня';
+  cAttrFName_SubLevel3 = 'Подстановка третьего уровня';
 
 const
-  // as this language is case-insensitive keywords *must* be in lowercase
-  KeyWords: array [0 .. 22] of UnicodeString = ('and', 'btn', 'cls', 'clsb',
-    'else', 'end', 'goto', 'if', 'include', 'input', 'instr', 'inv', 'invkill',
-    'music', 'not', 'or', 'p', 'pause', 'perkill', 'pln', 'proc',
-    'quit', 'then');
+  cNumOfKeywords = 35;
+  cKeyWords: array [1 .. cNumOfKeywords] of Unicodestring = ('p', 'pln', 'cls',
+    'clsb', 'clst', 'clsl', 'if', 'then', 'else', 'and', 'or', 'not', 'inv',
+    'invkill', 'goto', 'proc', 'pause', 'input', 'anykey', 'btn', 'image',
+    'music', 'fademusic', 'play', 'voice', 'save', 'tokens', 'end', 'decoradd',
+    'decordel', 'decormov', 'decorcor', 'decorrot', 'decorscl', 'decorscr');
 
-  KeyIndices: array [0 .. 30] of Integer = (2, 11, -1, 0, 1, 4, 5, 3, 14, -1,
-    -1, 17, 9, 12, 7, 8, 6, -1, 19, 18, 20, -1, 21, -1, 22, -1, 16, -1,
-    15, 13, 10);
+  cDecorTypeCount = 8;
+  cDecorTypes: array [1 .. cDecorTypeCount] of Unicodestring = ('text', 'rect',
+    'image', 'animation', 'gif', 'textbutton', 'imgbutton', 'clickarea');
 
-procedure TSynURQLSyn.InitIdent;
-var
-  i: Integer;
-begin
-  for i := Low(fIdentFuncTable) to High(fIdentFuncTable) do
-    if KeyIndices[i] = -1 then
-      fIdentFuncTable[i] := AltFunc;
+  cSpecialVarsCount = 51;
+  cSpecialVars: array [1 .. cSpecialVarsCount] of Unicodestring = ('textcolor',
+    'gametitle', 'time', 'fp_prec', 'last_btn_caption', 'is_syskey',
+    'hide_pause_indicator', 'hide_anykey_indicator', 'hide_more_indicator',
+    'current_loc', 'mousecursor', 'style_dos_textcolor', 'textalign',
+    'music_looped', 'textfont', 'textcolor', 'echocolor', 'linkcolor',
+    'linkhcolor', 'music_volume', 'voice_volume', 'textpane_left',
+    'textpane_top', 'textpane_width', 'textpane_height', 'mouse_x', 'mouse_y',
+    'fp_filename', 'hide_save_echo', 'hide_btn_echo', 'hide_inv_echo',
+    'hide_link_echo', 'hide_local_echo', 'menu_textfont', 'menu_bgcolor',
+    'menu_bordercolor', 'menu_textcolor', 'menu_hindent', 'menu_vindent',
+    'menu_selectioncolor', 'menu_seltextcolor', 'menu_disabledcolor',
+    'btnalign', 'btntxtalign', 'linespacing', 'paraspacing', 'numbuttons',
+    'bmenualign', 'lmenualign', 'fullscreen', 'savenamebase');
 
-  fIdentFuncTable[3] := FuncAnd;
-  fIdentFuncTable[4] := FuncBtn;
-  fIdentFuncTable[0] := FuncCls;
-  fIdentFuncTable[7] := FuncClsb;
-  fIdentFuncTable[5] := FuncElse;
-  fIdentFuncTable[6] := FuncEnd;
-  fIdentFuncTable[16] := FuncGoto;
-  fIdentFuncTable[14] := FuncIf;
-  fIdentFuncTable[15] := FuncInclude;
-  fIdentFuncTable[12] := FuncInput;
-  fIdentFuncTable[30] := FuncInstr;
-  fIdentFuncTable[1] := FuncInv;
-  fIdentFuncTable[13] := FuncInvkill;
-  fIdentFuncTable[29] := FuncMusic;
-  fIdentFuncTable[8] := FuncNot;
-  fIdentFuncTable[28] := FuncOr;
-  fIdentFuncTable[26] := FuncP;
-  fIdentFuncTable[11] := FuncPause;
-  fIdentFuncTable[19] := FuncPerkill;
-  fIdentFuncTable[18] := FuncPln;
-  fIdentFuncTable[20] := FuncProc;
-  fIdentFuncTable[22] := FuncQuit;
-  fIdentFuncTable[24] := FuncThen;
-end;
+  cSpecialVarPrefixesCount = 4;
+  cSpecialVarPrefixes: array [1 .. cSpecialVarPrefixesCount] of Unicodestring =
+    ('count_', 'idisp_', 'inv_', 'gss_');
 
-{$Q-}
+  cDecorVarSuffixesCount = 24;
+  cDecorVarSuffixes: array [1 .. cDecorVarSuffixesCount] of Unicodestring =
+    ('_color', '_hide', '_script', '_text', '_width', '_height', '_align',
+    '_linespacing', '_paraspacing', '_linkcolor', '_linkhcolor', '_hotx',
+    '_hoty', '_angle', '_rotspeed', '_scale', '_frame', '_anispeed', '_anitype',
+    '_target', '_enabled', '_menualign', '_flipx', '_flipy');
 
-function TSynURQLSyn.HashKey(Str: PWideChar): Cardinal;
-begin
-  Result := 0;
-  while IsIdentChar(Str^) do
-  begin
-    Result := Result * 977 + Ord(Str^) * 3;
-    inc(Str);
-  end;
-  Result := Result mod 31;
-  fStringLen := Str - fToIdent;
-end;
-{$Q+}
+  cPlnIdx = [1, 2];
+  cDecorAddIdx = 29;
+  cThenIdx = 8;
+  cElseIdx = 9;
 
-function TSynURQLSyn.FuncAnd(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncBtn(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncCls(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncClsb(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncElse(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncEnd(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncGoto(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncIf(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncInclude(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncInput(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncInstr(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncInv(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncInvkill(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncMusic(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncNot(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncOr(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncP(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncPause(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncPerkill(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncPln(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncProc(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncQuit(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.FuncThen(Index: Integer): TtkTokenKind;
-begin
-  if IsCurrentToken(KeyWords[Index]) then
-    Result := tkKey
-  else
-    Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.AltFunc(Index: Integer): TtkTokenKind;
-begin
-  Result := tkIdentifier;
-end;
-
-function TSynURQLSyn.IdentKind(MayBe: PWideChar): TtkTokenKind;
-var
-  Key: Cardinal;
-begin
-  fToIdent := MayBe;
-  Key := HashKey(MayBe);
-  if Key <= High(fIdentFuncTable) then
-    Result := fIdentFuncTable[Key](KeyIndices[Key])
-  else
-    Result := tkIdentifier;
-end;
-
-procedure TSynURQLSyn.SpaceProc;
-begin
-  inc(Run);
-  fTokenID := tkSpace;
-  while (FLine[Run] <= #32) and not IsLineEnd(Run) do
-    inc(Run);
-end;
-
-procedure TSynURQLSyn.NullProc;
-begin
-  fTokenID := tkNull;
-  inc(Run);
-end;
-
-procedure TSynURQLSyn.CRProc;
-begin
-  fTokenID := tkSpace;
-  inc(Run);
-  if FLine[Run] = #10 then
-    inc(Run);
-end;
-
-procedure TSynURQLSyn.LFProc;
-begin
-  fTokenID := tkSpace;
-  inc(Run);
-end;
-
-procedure TSynURQLSyn.BeginLocationOpenProc;
-begin
-  inc(Run);
-  fRange := rsBeginLocation;
-  BeginLocationProc;
-  fTokenID := tkKey;
-end;
-
-procedure TSynURQLSyn.BeginLocationProc;
-begin
-  fTokenID := tkKey;
-  repeat
-    if (FLine[Run] = ':') then
-      Break;
-    if not IsLineEnd(Run) then
-      inc(Run);
-  until IsLineEnd(Run);
-end;
-
-procedure TSynURQLSyn.LineCommentOpenProc;
-begin
-  inc(Run);
-  fRange := rsLineComment;
-  LineCommentProc;
-  fTokenID := tkComment;
-end;
-
-procedure TSynURQLSyn.LineCommentProc;
-begin
-  fTokenID := tkComment;
-  repeat
-    if (FLine[Run] = ';') then
-      Break;
-    if not IsLineEnd(Run) then
-      inc(Run);
-  until IsLineEnd(Run);
-end;
-
-procedure TSynURQLSyn.MultiLineCommentOpenProc;
-begin
-  inc(Run);
-  if (FLine[Run] = '*') then
-  begin
-    inc(Run, 1);
-    fRange := rsMultiLineComment;
-    fTokenID := tkComment;
-  end
-  else
-    fTokenID := tkIdentifier;
-end;
-
-procedure TSynURQLSyn.MultiLineCommentProc;
-begin
-  case FLine[Run] of
-    #0:
-      NullProc;
-    #10:
-      LFProc;
-    #13:
-      CRProc;
-  else
-    begin
-      fTokenID := tkComment;
-      repeat
-        if (FLine[Run] = '*') and (FLine[Run + 1] = '/') then
-        begin
-          inc(Run, 2);
-          fRange := rsUnKnown;
-          Break;
-        end;
-        if not IsLineEnd(Run) then
-          inc(Run);
-      until IsLineEnd(Run);
-    end;
-  end;
-end;
-
-procedure TSynURQLSyn.StringOpenProc;
-begin
-  inc(Run);
-  fRange := rsString;
-  StringProc;
-  fTokenID := tkString;
-end;
-
-procedure TSynURQLSyn.StringProc;
-begin
-  fTokenID := tkString;
-  repeat
-    if (FLine[Run] = '"') then
-    begin
-      inc(Run, 1);
-      fRange := rsUnKnown;
-      Break;
-    end;
-    if not IsLineEnd(Run) then
-      inc(Run);
-  until IsLineEnd(Run);
-end;
-
-constructor TSynURQLSyn.Create(AOwner: TComponent);
+constructor  TSynURQLSyn.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   fCaseSensitive := False;
-
-  fCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrComment,
-    SYNS_FriendlyAttrComment);
-  fCommentAttri.Style := [fsItalic];
-  fCommentAttri.Foreground := clNavy;
-  AddAttribute(fCommentAttri);
-
-  fIdentifierAttri := TSynHighlighterAttributes.Create(SYNS_AttrIdentifier,
-    SYNS_FriendlyAttrIdentifier);
-  AddAttribute(fIdentifierAttri);
-
-  fKeyAttri := TSynHighlighterAttributes.Create(SYNS_AttrReservedWord,
-    SYNS_FriendlyAttrReservedWord);
-  fKeyAttri.Style := [fsBold];
-  AddAttribute(fKeyAttri);
-
-  fSpaceAttri := TSynHighlighterAttributes.Create(SYNS_AttrSpace,
-    SYNS_FriendlyAttrSpace);
-  AddAttribute(fSpaceAttri);
-
-  fStringAttri := TSynHighlighterAttributes.Create(SYNS_AttrString,
-    SYNS_FriendlyAttrString);
-  fStringAttri.Foreground := clRed;
-  AddAttribute(fStringAttri);
-
-  fTestAttri := TSynHighlighterAttributes.Create(SYNS_AttrTest,
-    SYNS_FriendlyAttrTest);
-  fTestAttri.Style := [fsUnderline, fsItalic];
-  fTestAttri.Foreground := clBlue;
-  fTestAttri.Background := clSilver;
-  AddAttribute(fTestAttri);
-
-  SetAttributesOnChange(DefHighlightChange);
-  InitIdent;
-  fDefaultFilter := SYNS_FilterURQL;
-  fRange := rsUnKnown;
+  f_CommentAttr := TSynHighlighterAttributes.Create(cAttrName_Comment,
+    cAttrFName_Comment);
+  f_CommentAttr.Foreground := clTeal;
+  AddAttribute(f_CommentAttr);
+  f_LabelAttr := TSynHighlighterAttributes.Create(cAttrName_Label,
+    cAttrFName_Label);
+  f_LabelAttr.Foreground := clFuchsia;
+  AddAttribute(f_LabelAttr);
+  f_SymbolAttr := TSynHighlighterAttributes.Create(cAttrName_Symbol,
+    cAttrFName_Symbol);
+  f_SymbolAttr.Foreground := clWhite;
+  AddAttribute(f_SymbolAttr);
+  f_DefaultAttr := TSynHighlighterAttributes.Create(cAttrName_Default,
+    cAttrFName_Default);
+  f_DefaultAttr.Foreground := clSilver;
+  AddAttribute(f_DefaultAttr);
+  f_NumberAttr := TSynHighlighterAttributes.Create(cAttrName_Number,
+    cAttrFName_Number);
+  f_NumberAttr.Foreground := clLime;
+  AddAttribute(f_NumberAttr);
+  f_KeyWordAttr := TSynHighlighterAttributes.Create(cAttrName_Keyword,
+    cAttrFName_Keyword);
+  f_KeyWordAttr.Foreground := clYellow;
+  AddAttribute(f_KeyWordAttr);
+  f_PlnTextAttr := TSynHighlighterAttributes.Create(cAttrName_PlnText,
+    cAttrFName_PlnText);
+  f_PlnTextAttr.Foreground := $EDDCBC;
+  AddAttribute(f_PlnTextAttr);
+  f_StringAttr := TSynHighlighterAttributes.Create(cAttrName_String,
+    cAttrFName_String);
+  f_StringAttr.Foreground := clAqua;
+  AddAttribute(f_StringAttr);
+  f_OverlineAttr := TSynHighlighterAttributes.Create(cAttrName_Overline,
+    cAttrFName_Overline);
+  f_OverlineAttr.Foreground := $75BEFF; // clBlue;
+  AddAttribute(f_OverlineAttr);
+  f_SpecialAttr := TSynHighlighterAttributes.Create(cAttrName_Special,
+    cAttrFName_Special);
+  f_SpecialAttr.Foreground := $4EBFFF;
+  AddAttribute(f_SpecialAttr);
+  f_SubLevel1Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel1,
+    cAttrFName_SubLevel1);
+  f_SubLevel1Attr.Foreground := $AAAAFF;
+  AddAttribute(f_SubLevel1Attr);
+  f_SubLevel2Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel2,
+    cAttrFName_SubLevel2);
+  f_SubLevel2Attr.Foreground := $8277FB;
+  AddAttribute(f_SubLevel2Attr);
+  f_SubLevel3Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel3,
+    cAttrFName_SubLevel3);
+  f_SubLevel3Attr.Foreground := clRed;
+  AddAttribute(f_SubLevel3Attr);
+  fDefaultFilter := cURQFilter;
 end;
 
-procedure TSynURQLSyn.IdentProc;
-begin
-  fTokenID := IdentKind(FLine + Run);
-  inc(Run, fStringLen);
-  while IsIdentChar(FLine[Run]) do
-    inc(Run);
-end;
-
-procedure TSynURQLSyn.UnknownProc;
-begin
-  inc(Run);
-  fTokenID := tkUnknown;
-end;
-
-procedure TSynURQLSyn.Next;
-begin
-  fTokenPos := Run;
-  case fRange of
-    rsMultiLineComment:
-      MultiLineCommentProc;
-  else
-    case FLine[Run] of
-      #0:
-        NullProc;
-      #10:
-        LFProc;
-      #13:
-        CRProc;
-      ':':
-        BeginLocationOpenProc;
-      ';':
-        LineCommentOpenProc;
-      '/':
-        MultiLineCommentOpenProc;
-      '"':
-        StringOpenProc;
-      #1 .. #9, #11, #12, #14 .. #32:
-        SpaceProc;
-      'A' .. 'Z', 'a' .. 'z', '_':
-        IdentProc;
-    else
-      UnknownProc;
-    end;
-  end;
-  inherited;
-end;
-
-function TSynURQLSyn.GetDefaultAttribute(Index: Integer)
+function  TSynURQLSyn.GetDefaultAttribute(Index: Integer)
   : TSynHighlighterAttributes;
 begin
   case Index of
     SYN_ATTR_COMMENT:
-      Result := fCommentAttri;
-    SYN_ATTR_IDENTIFIER:
-      Result := fIdentifierAttri;
-    SYN_ATTR_KEYWORD:
-      Result := fKeyAttri;
-    SYN_ATTR_STRING:
-      Result := fStringAttri;
-    SYN_ATTR_WHITESPACE:
-      Result := fSpaceAttri;
+      Result := f_CommentAttr;
+    // SYN_ATTR_IDENTIFIER: Result := fIdentifierAttri;
+    // SYN_ATTR_KEYWORD: Result := fKeyAttri;
+    // SYN_ATTR_WHITESPACE: Result := fSpaceAttri;
   else
     Result := nil;
   end;
 end;
 
-function TSynURQLSyn.GetEol: Boolean;
+function  TSynURQLSyn.GetEol: Boolean;
 begin
   Result := Run = fLineLen + 1;
 end;
 
-function TSynURQLSyn.GetKeyWords(TokenKind: Integer): UnicodeString;
+class function  TSynURQLSyn.GetFriendlyLanguageName: Unicodestring;
 begin
-  Result := 'and,btn,cls,clsb,else,end,goto,if,include,input,instr,inv,invkill,mus'
-    + 'ic,not,or,p,pause,perkill,pln,proc,quit,then';
+  Result := 'URQ Quest';
 end;
 
-function TSynURQLSyn.GetTokenID: TtkTokenKind;
+class function  TSynURQLSyn.GetLanguageName: string;
 begin
-  Result := fTokenID;
+  Result := 'URQ';
 end;
 
-function TSynURQLSyn.GetTokenAttribute: TSynHighlighterAttributes;
+function  TSynURQLSyn.GetRange: Pointer;
 begin
-  case GetTokenID of
-    tkComment:
-      Result := fCommentAttri;
-    tkIdentifier:
-      Result := fIdentifierAttri;
-    tkKey:
-      Result := fKeyAttri;
-    tkSpace:
-      Result := fSpaceAttri;
-    tkString:
-      Result := fStringAttri;
-    tkTest:
-      Result := fTestAttri;
-    tkUnknown:
-      Result := fIdentifierAttri;
+  Result := Pointer(f_CurRange);
+end;
+
+function  TSynURQLSyn.GetTokenAttribute: TSynHighlighterAttributes;
+begin
+  Result := f_DefaultAttr;
+  if f_CurToken = tkComment then
+    Result := f_CommentAttr
   else
-    Result := nil;
+  begin
+    if f_CurToken = tkOverLine then
+      Result := f_OverlineAttr
+    else if f_CurRange = rkGeneral then
+      case f_CurToken of
+        tkLabel:
+          Result := f_LabelAttr;
+        tkSymbol:
+          Result := f_SymbolAttr;
+        tkNumber:
+          Result := f_NumberAttr;
+        tkIdentifier:
+          Result := f_DefaultAttr;
+        tkKeyWord:
+          Result := f_KeyWordAttr;
+        tkDecoratorType:
+          Result := f_SpecialAttr;
+        tkSpecialVar:
+          Result := f_SpecialAttr;
+        tkUnknown:
+          Result := f_DefaultAttr;
+      else
+        Result := nil;
+      end
+    else
+    begin
+      case f_CurRange of
+        rkPlnText:
+          Result := f_PlnTextAttr;
+        rkString:
+          Result := f_StringAttr;
+        rkSub:
+          case f_SubLevel of
+            1:
+              Result := f_SubLevel1Attr;
+            2:
+              Result := f_SubLevel2Attr;
+          else
+            Result := f_SubLevel3Attr;
+          end;
+        rkMultilineComment:
+          Result := f_CommentAttr;
+      end; // case
+    end;
   end;
 end;
 
-function TSynURQLSyn.GetTokenKind: Integer;
+function  TSynURQLSyn.GetTokenKind: Integer;
 begin
-  Result := Ord(fTokenID);
+  Result := Ord(f_CurToken);
 end;
 
-function TSynURQLSyn.IsIdentChar(AChar: WideChar): Boolean;
+function  TSynURQLSyn.IsCurrentTokenStartsWith(const aPrefix
+  : Unicodestring): Boolean;
+var
+  I: Integer;
+  l_Temp: PWideChar;
 begin
-  case AChar of
-    '_', '0' .. '9', 'a' .. 'z', 'A' .. 'Z':
+  if Length(aPrefix) < fStringLen then
+  begin
+    l_Temp := fToIdent;
+    Result := True;
+    for I := 1 to Length(aPrefix) do
+    begin
+      if l_Temp^ <> aPrefix[I] then
+      begin
+        Result := False;
+        break;
+      end;
+      inc(l_Temp);
+    end;
+  end
+  else
+    Result := False;
+end;
+
+function  TSynURQLSyn.IsCurrentTokenEndsWith(const aSuffix
+  : Unicodestring): Boolean;
+var
+  I: Integer;
+  l_Temp: PWideChar;
+begin
+  if Length(aSuffix) < fStringLen then
+  begin
+    l_Temp := fToIdent + fStringLen - 1;
+    Result := True;
+    for I := Length(aSuffix) downto 1 do
+    begin
+      if l_Temp^ <> aSuffix[I] then
+      begin
+        Result := False;
+        break;
+      end;
+      Dec(l_Temp);
+    end;
+  end
+  else
+    Result := False;
+end;
+
+function  TSynURQLSyn.IsIdentChar(aChar: WideChar): Boolean;
+begin
+  case aChar of
+    '_', '0' .. '9', 'a' .. 'z', #1072 .. #1103:
       Result := True;
   else
     Result := False;
   end;
 end;
 
-function TSynURQLSyn.GetSampleSource: UnicodeString;
+function  TSynURQLSyn.IsLabelChar(aChar: WideChar): Boolean;
 begin
-  Result := 'Sample source for: '#13#10 + 'Syntax Parser/Highlighter';
+  case aChar of
+    'a' .. 'z', '0' .. '9', #1072 .. #1103, '-', '.', '_':
+      Result := True;
+  else
+    Result := False;
+  end;
 end;
 
-function TSynURQLSyn.IsFilterStored: Boolean;
+function  TSynURQLSyn.IsRndVar: Boolean;
+var
+  I: Integer;
+  l_Temp: PWideChar;
 begin
-  Result := fDefaultFilter <> SYNS_FilterURQL;
+  Result := IsCurrentTokenStartsWith('rnd');
+  if Result then
+  begin
+    l_Temp := fToIdent + 3;
+    for I := 4 to fStringLen do
+    begin
+      case l_Temp^ of
+        '0' .. '9':
+          ;
+      else
+        begin
+          Result := False;
+          break;
+        end;
+      end;
+      inc(l_Temp);
+    end;
+  end;
 end;
 
-class function TSynURQLSyn.GetFriendlyLanguageName: UnicodeString;
+procedure  TSynURQLSyn.NewCodeLineStarted;
 begin
-  Result := SYNS_FriendlyLangURQL;
+  ResetRange;
+  f_ThenCount := 0;
+  f_SubLevel := 0;
+  f_InDecoradd := False;
 end;
 
-class function TSynURQLSyn.GetLanguageName: string;
+procedure  TSynURQLSyn.Next;
 begin
-  Result := SYNS_LangURQL;
+  if (Run = 0) and (f_CurRange <> rkMultilineComment) then
+  begin
+    while (not IsLineEnd(Run)) and IsWhiteChar(fLine[Run]) do
+      inc(Run);
+    if fLine[Run] <> '_' then
+      NewCodeLineStarted
+    else
+    begin
+      f_CurToken := tkOverLine;
+      inc(Run);
+      inherited;
+      Exit;
+    end;
+  end
+  else if f_RangeToSet <> rkNull then
+  begin
+    if (f_CurRange <> rkMultilineComment) and (f_SubLevel > 0) then
+    begin
+      Dec(f_SubLevel);
+      if f_SubLevel = 0 then
+        f_CurRange := f_RangeToSet;
+    end
+    else
+      f_CurRange := f_RangeToSet;
+    f_RangeToSet := rkNull;
+  end;
+  fTokenPos := Run;
+  if f_CurRange = rkMultilineComment then
+    TP_MultilineComment
+  else
+    case fLine[Run] of
+      ';':
+        TP_LineComment;
+      ':':
+        TP_Label;
+      #1 .. #9, #11, #12, #14 .. #32:
+        TP_Space;
+      '+', '=', ',', '<', '>', '*', '(', ')':
+        TP_Symbol;
+      '&':
+        TP_Ampersand;
+      '-':
+        TP_Minus;
+      '"', '''':
+        TP_Comma(fLine[Run]);
+      '0' .. '9':
+        TP_Number;
+      '#':
+        TP_SubStart;
+      '$':
+        TP_SubEnd;
+      '/':
+        TP_Slash;
+      '_', 'a' .. 'z', #1072 .. #1103:
+        TP_Ident;
+    else
+      TP_Unknown;
+    end; // case
+  inherited;
 end;
 
-procedure TSynURQLSyn.ResetRange;
+procedure  TSynURQLSyn.ResetRange;
 begin
-  fRange := rsUnKnown;
+  f_CurRange := rkGeneral;
+  f_RangeToSet := rkNull;
 end;
 
-procedure TSynURQLSyn.SetRange(Value: Pointer);
+procedure  TSynURQLSyn.SetRange(Value: Pointer);
 begin
-  fRange := TRangeState(Value);
+  f_CurRange := TRangeKind(Value);
 end;
 
-function TSynURQLSyn.GetRange: Pointer;
+procedure  TSynURQLSyn.TP_Ampersand;
 begin
-  Result := Pointer(fRange);
+  f_CurToken := tkSymbol;
+  inc(Run);
+  f_CurRange := rkGeneral;
+  f_InDecoradd := False;
 end;
 
-initialization
+procedure  TSynURQLSyn.TP_Comma(aChar: WideChar);
+begin
+  f_CurToken := tkSymbol;
+  inc(Run);
+  case f_CurRange of
+    rkGeneral:
+      begin
+        f_CurRange := rkString;
+        f_StringComma := aChar;
+      end;
+    rkString:
+      if aChar = f_StringComma then
+        f_RangeToSet := rkGeneral;
+  end;
+end;
 
-{$IFNDEF SYN_CPPB_1}
-  RegisterPlaceableHighlighter(TSynURQLSyn);
-{$ENDIF}
+procedure  TSynURQLSyn.TP_LineComment;
+begin
+  f_CurToken := tkComment;
+  repeat
+    inc(Run);
+  until IsLineEnd(Run);
+end;
+
+procedure  TSynURQLSyn.TP_Ident;
+var
+  I: Integer;
+  l_Start: Integer;
+begin
+  fToIdent := fLine + Run;
+  l_Start := Run;
+  repeat
+    inc(Run);
+  until IsLineEnd(Run) or (not IsIdentChar(fLine[Run]));
+  fStringLen := Run - l_Start;
+  f_CurToken := tkIdentifier;
+
+  for I := 1 to cSpecialVarsCount do
+    if IsCurrentToken(cSpecialVars[I]) then
+    begin
+      f_CurToken := tkSpecialVar;
+      break;
+    end;
+
+  if (f_CurToken = tkIdentifier) then
+  begin
+    for I := 1 to cSpecialVarPrefixesCount do
+      if IsCurrentTokenStartsWith(cSpecialVarPrefixes[I]) then
+      begin
+        f_CurToken := tkSpecialVar;
+        break;
+      end;
+  end;
+
+  if (f_CurToken = tkIdentifier) and IsCurrentTokenStartsWith('decor_') then
+  begin
+    for I := 1 to cDecorVarSuffixesCount do
+      if IsCurrentTokenEndsWith(cDecorVarSuffixes[I]) then
+      begin
+        f_CurToken := tkSpecialVar;
+        break;
+      end;
+  end;
+
+  if (f_CurToken = tkIdentifier) and IsRndVar then
+    f_CurToken := tkSpecialVar;
+
+  if f_InDecoradd and (f_CurToken = tkIdentifier) then
+  begin
+    for I := 1 to cDecorTypeCount do
+      if IsCurrentToken(cDecorTypes[I]) then
+      begin
+        f_CurToken := tkDecoratorType;
+        break;
+      end;
+  end;
+
+  if f_CurToken = tkIdentifier then
+  begin
+    for I := 1 to cNumOfKeywords do
+      if IsCurrentToken(cKeyWords[I]) then
+      begin
+        f_CurToken := tkKeyWord;
+        if (I in cPlnIdx) and (f_CurRange = rkGeneral) then
+          f_RangeToSet := rkPlnText;
+        if (I = cThenIdx) and (f_CurRange = rkGeneral) then
+          inc(f_ThenCount);
+        if (I = cElseIdx) and (f_ThenCount > 0) then
+        begin
+          Dec(f_ThenCount);
+          if (f_CurRange = rkPlnText) then
+            f_CurRange := rkGeneral;
+        end;
+        if (I = cDecorAddIdx) then
+          f_InDecoradd := True;
+        break;
+      end;
+  end;
+end;
+
+procedure  TSynURQLSyn.TP_Label;
+begin
+  inc(Run);
+  if Run = 1 then
+  begin
+    f_CurToken := tkLabel;
+    while (not IsLineEnd(Run)) and IsLabelChar(fLine[Run]) do
+      inc(Run);
+  end
+  else
+    f_CurToken := tkSymbol;
+end;
+
+procedure  TSynURQLSyn.TP_Minus;
+begin
+  f_CurToken := tkSymbol;
+  inc(Run);
+  case fLine[Run] of
+    '0' .. '9':
+      TP_Number;
+  end;
+end;
+
+procedure  TSynURQLSyn.TP_MultilineComment;
+begin
+  f_CurToken := tkComment;
+  repeat
+    if fLine[Run] = '*' then
+    begin
+      inc(Run);
+      if fLine[Run] = '/' then
+      begin
+        f_RangeToSet := f_RangeBeforeMLC;
+        inc(Run);
+      end;
+    end
+    else
+      inc(Run);
+  until IsLineEnd(Run) or (f_RangeToSet <> rkNull);
+end;
+
+procedure  TSynURQLSyn.TP_Number;
+var
+  l_FirstZero: Integer;
+  l_IsHex: Boolean;
+
+  function IsNumberChar: Boolean;
+  begin
+    case fLine[Run] of
+      '0' .. '9':
+        Result := True;
+      '.':
+        Result := not l_IsHex;
+      'a' .. 'f':
+        Result := l_IsHex;
+    else
+      Result := False;
+    end;
+  end;
+
+begin
+  f_CurToken := tkNumber;
+  if fLine[Run] = '0' then
+    l_FirstZero := Run
+  else
+    l_FirstZero := -1;
+  l_IsHex := False;
+  repeat
+    inc(Run);
+    if (not IsLineEnd(Run)) and (fLine[Run] = 'x') and (Run = l_FirstZero + 1)
+    then
+    begin
+      l_IsHex := True;
+      inc(Run);
+    end;
+  until (not IsNumberChar) or IsLineEnd(Run);
+end;
+
+procedure  TSynURQLSyn.TP_Slash;
+begin
+  f_CurToken := tkSymbol;
+  inc(Run);
+  if fLine[Run] = '*' then
+  begin
+    inc(Run);
+    f_RangeBeforeMLC := f_CurRange;
+    f_CurRange := rkMultilineComment;
+  end;
+end;
+
+procedure  TSynURQLSyn.TP_Space;
+begin
+  f_CurToken := tkSpace;
+  repeat
+    inc(Run);
+  until (fLine[Run] > #32) or IsLineEnd(Run);
+end;
+
+procedure  TSynURQLSyn.TP_SubEnd;
+begin
+  if f_CurRange <> rkMultilineComment then
+  begin
+    f_CurToken := tkSymbol;
+    inc(Run);
+    if f_SubLevel > 0 then
+      f_RangeToSet := f_RangeBeforeSub;
+  end
+  else
+  begin
+    inc(Run);
+    f_CurToken := tkSymbol;
+  end;
+end;
+
+procedure  TSynURQLSyn.TP_SubStart;
+begin
+  if f_CurRange <> rkMultilineComment then
+  begin
+    inc(f_SubLevel);
+    if f_SubLevel = 1 then
+      f_RangeBeforeSub := f_CurRange;
+    f_CurToken := tkSymbol;
+    inc(Run);
+    f_CurRange := rkSub;
+  end
+  else
+  begin
+    inc(Run);
+    f_CurToken := tkSymbol;
+  end;
+end;
+
+procedure  TSynURQLSyn.TP_Symbol;
+begin
+  inc(Run);
+  f_CurToken := tkSymbol;
+end;
+
+procedure  TSynURQLSyn.TP_Unknown;
+begin
+  inc(Run);
+  f_CurToken := tkUnknown;
+end;
 
 end.
