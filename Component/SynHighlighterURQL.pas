@@ -1,4 +1,4 @@
-unit SynHighlighterURQL;
+п»їunit SynHighlighterURQL;
 
 interface
 
@@ -11,10 +11,9 @@ uses
   Classes;
 
 type
-  TTokenKind = (tkComment, tkIdentifier, tkKeyWord, tkString, tkNumber, tkSpace,
-    tkLabel, tkSymbol, tkOverLine, tkDecoratorType, tkSpecialVar, tkUnknown);
-  TRangeKind = (rkNull, rkGeneral, rkPlnText, rkString, rkSub,
-    rkMultilineComment);
+  TTokenKind = (tkComment, tkIdentifier, tkKeyWord, tkString, tkNumber, tkSpace, tkLabel, tkSymbol, tkOverLine, tkDecoratorType, tkSpecialVar,
+    tkUnknown);
+  TRangeKind = (rkNull, rkGeneral, rkPlnText, rkString, rkSub, rkMultilineComment);
 
 type
   TSynURQLSyn = class(TSynCustomHighlighter)
@@ -63,8 +62,7 @@ type
     function IsRndVar: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
-    function GetDefaultAttribute(Index: Integer)
-      : TSynHighlighterAttributes; override;
+    function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
     function GetEol: Boolean; override;
     class function GetFriendlyLanguageName: Unicodestring; override;
     class function GetLanguageName: string; override;
@@ -76,36 +74,23 @@ type
     procedure ResetRange; override;
     procedure SetRange(Value: Pointer); override;
   published
-    property CommentAttr: TSynHighlighterAttributes read f_CommentAttr
-      write f_CommentAttr;
-    property OverlineAttr: TSynHighlighterAttributes read f_OverlineAttr
-      write f_OverlineAttr;
-    property NumberAttr: TSynHighlighterAttributes read f_NumberAttr
-      write f_NumberAttr;
-    property DefaultAttr: TSynHighlighterAttributes read f_DefaultAttr
-      write f_DefaultAttr;
-    property LabelAttr: TSynHighlighterAttributes read f_LabelAttr
-      write f_LabelAttr;
-    property SymbolAttr: TSynHighlighterAttributes read f_SymbolAttr
-      write f_SymbolAttr;
-    property KeyWordAttr: TSynHighlighterAttributes read f_KeyWordAttr
-      write f_KeyWordAttr;
-    property StringAttr: TSynHighlighterAttributes read f_StringAttr
-      write f_StringAttr;
-    property PlnTextAttr: TSynHighlighterAttributes read f_PlnTextAttr
-      write f_PlnTextAttr;
-    property SpecialAttr: TSynHighlighterAttributes read f_SpecialAttr
-      write f_SpecialAttr;
-    property SubLevel1Attr: TSynHighlighterAttributes read f_SubLevel1Attr
-      write f_SubLevel1Attr;
-    property SubLevel2Attr: TSynHighlighterAttributes read f_SubLevel2Attr
-      write f_SubLevel2Attr;
-    property SubLevel3Attr: TSynHighlighterAttributes read f_SubLevel3Attr
-      write f_SubLevel3Attr;
+    property CommentAttr: TSynHighlighterAttributes read f_CommentAttr write f_CommentAttr;
+    property OverlineAttr: TSynHighlighterAttributes read f_OverlineAttr write f_OverlineAttr;
+    property NumberAttr: TSynHighlighterAttributes read f_NumberAttr write f_NumberAttr;
+    property DefaultAttr: TSynHighlighterAttributes read f_DefaultAttr write f_DefaultAttr;
+    property LabelAttr: TSynHighlighterAttributes read f_LabelAttr write f_LabelAttr;
+    property SymbolAttr: TSynHighlighterAttributes read f_SymbolAttr write f_SymbolAttr;
+    property KeyWordAttr: TSynHighlighterAttributes read f_KeyWordAttr write f_KeyWordAttr;
+    property StringAttr: TSynHighlighterAttributes read f_StringAttr write f_StringAttr;
+    property PlnTextAttr: TSynHighlighterAttributes read f_PlnTextAttr write f_PlnTextAttr;
+    property SpecialAttr: TSynHighlighterAttributes read f_SpecialAttr write f_SpecialAttr;
+    property SubLevel1Attr: TSynHighlighterAttributes read f_SubLevel1Attr write f_SubLevel1Attr;
+    property SubLevel2Attr: TSynHighlighterAttributes read f_SubLevel2Attr write f_SubLevel2Attr;
+    property SubLevel3Attr: TSynHighlighterAttributes read f_SubLevel3Attr write f_SubLevel3Attr;
   end;
 
-procedure Register;  
-  
+procedure Register;
+
 implementation
 
 procedure Register;
@@ -130,56 +115,44 @@ const
   cAttrName_SubLevel2 = 'substitute2';
   cAttrName_SubLevel3 = 'substitute3';
 
-  cAttrFName_Default = 'Текст по умолчанию';
-  cAttrFName_Comment = 'Комментарии';
-  cAttrFName_Label = 'Метка';
-  cAttrFName_Symbol = 'Символ';
-  cAttrFName_Number = 'Число';
-  cAttrFName_Keyword = 'Ключевое слово';
-  cAttrFName_Special = 'Особые переменные и значения';
-  cAttrFName_PlnText = 'Выводимый текст';
-  cAttrFName_String = 'Строка';
-  cAttrFName_Overline = 'Перенос';
-  cAttrFName_SubLevel1 = 'Подстановка первого уровня';
-  cAttrFName_SubLevel2 = 'Подстановка второго уровня';
-  cAttrFName_SubLevel3 = 'Подстановка третьего уровня';
+  cAttrFName_Default = 'РўРµРєСЃС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ';
+  cAttrFName_Comment = 'РљРѕРјРјРµРЅС‚Р°СЂРёРё';
+  cAttrFName_Label = 'РњРµС‚РєР°';
+  cAttrFName_Symbol = 'РЎРёРјРІРѕР»';
+  cAttrFName_Number = 'Р§РёСЃР»Рѕ';
+  cAttrFName_Keyword = 'РљР»СЋС‡РµРІРѕРµ СЃР»РѕРІРѕ';
+  cAttrFName_Special = 'РћСЃРѕР±С‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ Рё Р·РЅР°С‡РµРЅРёСЏ';
+  cAttrFName_PlnText = 'Р’С‹РІРѕРґРёРјС‹Р№ С‚РµРєСЃС‚';
+  cAttrFName_String = 'РЎС‚СЂРѕРєР°';
+  cAttrFName_Overline = 'РџРµСЂРµРЅРѕСЃ';
+  cAttrFName_SubLevel1 = 'РџРѕРґСЃС‚Р°РЅРѕРІРєР° РїРµСЂРІРѕРіРѕ СѓСЂРѕРІРЅСЏ';
+  cAttrFName_SubLevel2 = 'РџРѕРґСЃС‚Р°РЅРѕРІРєР° РІС‚РѕСЂРѕРіРѕ СѓСЂРѕРІРЅСЏ';
+  cAttrFName_SubLevel3 = 'РџРѕРґСЃС‚Р°РЅРѕРІРєР° С‚СЂРµС‚СЊРµРіРѕ СѓСЂРѕРІРЅСЏ';
 
 const
   cNumOfKeywords = 35;
-  cKeyWords: array [1 .. cNumOfKeywords] of Unicodestring = ('p', 'pln', 'cls',
-    'clsb', 'clst', 'clsl', 'if', 'then', 'else', 'and', 'or', 'not', 'inv',
-    'invkill', 'goto', 'proc', 'pause', 'input', 'anykey', 'btn', 'image',
-    'music', 'fademusic', 'play', 'voice', 'save', 'tokens', 'end', 'decoradd',
-    'decordel', 'decormov', 'decorcor', 'decorrot', 'decorscl', 'decorscr');
+  cKeyWords: array [1 .. cNumOfKeywords] of Unicodestring = ('p', 'pln', 'cls', 'clsb', 'clst', 'clsl', 'if', 'then', 'else', 'and', 'or', 'not',
+    'inv', 'invkill', 'goto', 'proc', 'pause', 'input', 'anykey', 'btn', 'image', 'music', 'fademusic', 'play', 'voice', 'save', 'tokens', 'end',
+    'decoradd', 'decordel', 'decormov', 'decorcor', 'decorrot', 'decorscl', 'decorscr');
 
   cDecorTypeCount = 8;
-  cDecorTypes: array [1 .. cDecorTypeCount] of Unicodestring = ('text', 'rect',
-    'image', 'animation', 'gif', 'textbutton', 'imgbutton', 'clickarea');
+  cDecorTypes: array [1 .. cDecorTypeCount] of Unicodestring = ('text', 'rect', 'image', 'animation', 'gif', 'textbutton', 'imgbutton', 'clickarea');
 
   cSpecialVarsCount = 51;
-  cSpecialVars: array [1 .. cSpecialVarsCount] of Unicodestring = ('textcolor',
-    'gametitle', 'time', 'fp_prec', 'last_btn_caption', 'is_syskey',
-    'hide_pause_indicator', 'hide_anykey_indicator', 'hide_more_indicator',
-    'current_loc', 'mousecursor', 'style_dos_textcolor', 'textalign',
-    'music_looped', 'textfont', 'textcolor', 'echocolor', 'linkcolor',
-    'linkhcolor', 'music_volume', 'voice_volume', 'textpane_left',
-    'textpane_top', 'textpane_width', 'textpane_height', 'mouse_x', 'mouse_y',
-    'fp_filename', 'hide_save_echo', 'hide_btn_echo', 'hide_inv_echo',
-    'hide_link_echo', 'hide_local_echo', 'menu_textfont', 'menu_bgcolor',
-    'menu_bordercolor', 'menu_textcolor', 'menu_hindent', 'menu_vindent',
-    'menu_selectioncolor', 'menu_seltextcolor', 'menu_disabledcolor',
-    'btnalign', 'btntxtalign', 'linespacing', 'paraspacing', 'numbuttons',
-    'bmenualign', 'lmenualign', 'fullscreen', 'savenamebase');
+  cSpecialVars: array [1 .. cSpecialVarsCount] of Unicodestring = ('textcolor', 'gametitle', 'time', 'fp_prec', 'last_btn_caption', 'is_syskey',
+    'hide_pause_indicator', 'hide_anykey_indicator', 'hide_more_indicator', 'current_loc', 'mousecursor', 'style_dos_textcolor', 'textalign',
+    'music_looped', 'textfont', 'textcolor', 'echocolor', 'linkcolor', 'linkhcolor', 'music_volume', 'voice_volume', 'textpane_left', 'textpane_top',
+    'textpane_width', 'textpane_height', 'mouse_x', 'mouse_y', 'fp_filename', 'hide_save_echo', 'hide_btn_echo', 'hide_inv_echo', 'hide_link_echo',
+    'hide_local_echo', 'menu_textfont', 'menu_bgcolor', 'menu_bordercolor', 'menu_textcolor', 'menu_hindent', 'menu_vindent', 'menu_selectioncolor',
+    'menu_seltextcolor', 'menu_disabledcolor', 'btnalign', 'btntxtalign', 'linespacing', 'paraspacing', 'numbuttons', 'bmenualign', 'lmenualign',
+    'fullscreen', 'savenamebase');
 
   cSpecialVarPrefixesCount = 4;
-  cSpecialVarPrefixes: array [1 .. cSpecialVarPrefixesCount] of Unicodestring =
-    ('count_', 'idisp_', 'inv_', 'gss_');
+  cSpecialVarPrefixes: array [1 .. cSpecialVarPrefixesCount] of Unicodestring = ('count_', 'idisp_', 'inv_', 'gss_');
 
   cDecorVarSuffixesCount = 24;
-  cDecorVarSuffixes: array [1 .. cDecorVarSuffixesCount] of Unicodestring =
-    ('_color', '_hide', '_script', '_text', '_width', '_height', '_align',
-    '_linespacing', '_paraspacing', '_linkcolor', '_linkhcolor', '_hotx',
-    '_hoty', '_angle', '_rotspeed', '_scale', '_frame', '_anispeed', '_anitype',
+  cDecorVarSuffixes: array [1 .. cDecorVarSuffixesCount] of Unicodestring = ('_color', '_hide', '_script', '_text', '_width', '_height', '_align',
+    '_linespacing', '_paraspacing', '_linkcolor', '_linkhcolor', '_hotx', '_hoty', '_angle', '_rotspeed', '_scale', '_frame', '_anispeed', '_anitype',
     '_target', '_enabled', '_menualign', '_flipx', '_flipy');
 
   cPlnIdx = [1, 2];
@@ -187,67 +160,53 @@ const
   cThenIdx = 8;
   cElseIdx = 9;
 
-constructor  TSynURQLSyn.Create(AOwner: TComponent);
+constructor TSynURQLSyn.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  inherited;
   fCaseSensitive := False;
-  f_CommentAttr := TSynHighlighterAttributes.Create(cAttrName_Comment,
-    cAttrFName_Comment);
+  f_CommentAttr := TSynHighlighterAttributes.Create(cAttrName_Comment, cAttrFName_Comment);
   f_CommentAttr.Foreground := clTeal;
   AddAttribute(f_CommentAttr);
-  f_LabelAttr := TSynHighlighterAttributes.Create(cAttrName_Label,
-    cAttrFName_Label);
+  f_LabelAttr := TSynHighlighterAttributes.Create(cAttrName_Label, cAttrFName_Label);
   f_LabelAttr.Foreground := clFuchsia;
   AddAttribute(f_LabelAttr);
-  f_SymbolAttr := TSynHighlighterAttributes.Create(cAttrName_Symbol,
-    cAttrFName_Symbol);
+  f_SymbolAttr := TSynHighlighterAttributes.Create(cAttrName_Symbol, cAttrFName_Symbol);
   f_SymbolAttr.Foreground := clWhite;
   AddAttribute(f_SymbolAttr);
-  f_DefaultAttr := TSynHighlighterAttributes.Create(cAttrName_Default,
-    cAttrFName_Default);
+  f_DefaultAttr := TSynHighlighterAttributes.Create(cAttrName_Default, cAttrFName_Default);
   f_DefaultAttr.Foreground := clSilver;
   AddAttribute(f_DefaultAttr);
-  f_NumberAttr := TSynHighlighterAttributes.Create(cAttrName_Number,
-    cAttrFName_Number);
+  f_NumberAttr := TSynHighlighterAttributes.Create(cAttrName_Number, cAttrFName_Number);
   f_NumberAttr.Foreground := clLime;
   AddAttribute(f_NumberAttr);
-  f_KeyWordAttr := TSynHighlighterAttributes.Create(cAttrName_Keyword,
-    cAttrFName_Keyword);
+  f_KeyWordAttr := TSynHighlighterAttributes.Create(cAttrName_Keyword, cAttrFName_Keyword);
   f_KeyWordAttr.Foreground := clYellow;
   AddAttribute(f_KeyWordAttr);
-  f_PlnTextAttr := TSynHighlighterAttributes.Create(cAttrName_PlnText,
-    cAttrFName_PlnText);
+  f_PlnTextAttr := TSynHighlighterAttributes.Create(cAttrName_PlnText, cAttrFName_PlnText);
   f_PlnTextAttr.Foreground := $EDDCBC;
   AddAttribute(f_PlnTextAttr);
-  f_StringAttr := TSynHighlighterAttributes.Create(cAttrName_String,
-    cAttrFName_String);
+  f_StringAttr := TSynHighlighterAttributes.Create(cAttrName_String, cAttrFName_String);
   f_StringAttr.Foreground := clAqua;
   AddAttribute(f_StringAttr);
-  f_OverlineAttr := TSynHighlighterAttributes.Create(cAttrName_Overline,
-    cAttrFName_Overline);
+  f_OverlineAttr := TSynHighlighterAttributes.Create(cAttrName_Overline, cAttrFName_Overline);
   f_OverlineAttr.Foreground := $75BEFF; // clBlue;
   AddAttribute(f_OverlineAttr);
-  f_SpecialAttr := TSynHighlighterAttributes.Create(cAttrName_Special,
-    cAttrFName_Special);
+  f_SpecialAttr := TSynHighlighterAttributes.Create(cAttrName_Special, cAttrFName_Special);
   f_SpecialAttr.Foreground := $4EBFFF;
   AddAttribute(f_SpecialAttr);
-  f_SubLevel1Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel1,
-    cAttrFName_SubLevel1);
+  f_SubLevel1Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel1, cAttrFName_SubLevel1);
   f_SubLevel1Attr.Foreground := $AAAAFF;
   AddAttribute(f_SubLevel1Attr);
-  f_SubLevel2Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel2,
-    cAttrFName_SubLevel2);
+  f_SubLevel2Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel2, cAttrFName_SubLevel2);
   f_SubLevel2Attr.Foreground := $8277FB;
   AddAttribute(f_SubLevel2Attr);
-  f_SubLevel3Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel3,
-    cAttrFName_SubLevel3);
+  f_SubLevel3Attr := TSynHighlighterAttributes.Create(cAttrName_SubLevel3, cAttrFName_SubLevel3);
   f_SubLevel3Attr.Foreground := clRed;
   AddAttribute(f_SubLevel3Attr);
   fDefaultFilter := cURQFilter;
 end;
 
-function  TSynURQLSyn.GetDefaultAttribute(Index: Integer)
-  : TSynHighlighterAttributes;
+function TSynURQLSyn.GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes;
 begin
   case Index of
     SYN_ATTR_COMMENT:
@@ -260,27 +219,27 @@ begin
   end;
 end;
 
-function  TSynURQLSyn.GetEol: Boolean;
+function TSynURQLSyn.GetEol: Boolean;
 begin
   Result := Run = fLineLen + 1;
 end;
 
-class function  TSynURQLSyn.GetFriendlyLanguageName: Unicodestring;
+class function TSynURQLSyn.GetFriendlyLanguageName: Unicodestring;
 begin
   Result := 'URQ Quest';
 end;
 
-class function  TSynURQLSyn.GetLanguageName: string;
+class function TSynURQLSyn.GetLanguageName: string;
 begin
   Result := 'URQ';
 end;
 
-function  TSynURQLSyn.GetRange: Pointer;
+function TSynURQLSyn.GetRange: Pointer;
 begin
   Result := Pointer(f_CurRange);
 end;
 
-function  TSynURQLSyn.GetTokenAttribute: TSynHighlighterAttributes;
+function TSynURQLSyn.GetTokenAttribute: TSynHighlighterAttributes;
 begin
   Result := f_DefaultAttr;
   if f_CurToken = tkComment then
@@ -333,13 +292,12 @@ begin
   end;
 end;
 
-function  TSynURQLSyn.GetTokenKind: Integer;
+function TSynURQLSyn.GetTokenKind: Integer;
 begin
   Result := Ord(f_CurToken);
 end;
 
-function  TSynURQLSyn.IsCurrentTokenStartsWith(const aPrefix
-  : Unicodestring): Boolean;
+function TSynURQLSyn.IsCurrentTokenStartsWith(const aPrefix: Unicodestring): Boolean;
 var
   I: Integer;
   l_Temp: PWideChar;
@@ -362,8 +320,7 @@ begin
     Result := False;
 end;
 
-function  TSynURQLSyn.IsCurrentTokenEndsWith(const aSuffix
-  : Unicodestring): Boolean;
+function TSynURQLSyn.IsCurrentTokenEndsWith(const aSuffix: Unicodestring): Boolean;
 var
   I: Integer;
   l_Temp: PWideChar;
@@ -386,7 +343,7 @@ begin
     Result := False;
 end;
 
-function  TSynURQLSyn.IsIdentChar(aChar: WideChar): Boolean;
+function TSynURQLSyn.IsIdentChar(aChar: WideChar): Boolean;
 begin
   case aChar of
     '_', '0' .. '9', 'a' .. 'z', #1072 .. #1103:
@@ -396,7 +353,7 @@ begin
   end;
 end;
 
-function  TSynURQLSyn.IsLabelChar(aChar: WideChar): Boolean;
+function TSynURQLSyn.IsLabelChar(aChar: WideChar): Boolean;
 begin
   case aChar of
     'a' .. 'z', '0' .. '9', #1072 .. #1103, '-', '.', '_':
@@ -406,7 +363,7 @@ begin
   end;
 end;
 
-function  TSynURQLSyn.IsRndVar: Boolean;
+function TSynURQLSyn.IsRndVar: Boolean;
 var
   I: Integer;
   l_Temp: PWideChar;
@@ -431,7 +388,7 @@ begin
   end;
 end;
 
-procedure  TSynURQLSyn.NewCodeLineStarted;
+procedure TSynURQLSyn.NewCodeLineStarted;
 begin
   ResetRange;
   f_ThenCount := 0;
@@ -439,7 +396,7 @@ begin
   f_InDecoradd := False;
 end;
 
-procedure  TSynURQLSyn.Next;
+procedure TSynURQLSyn.Next;
 begin
   if (Run = 0) and (f_CurRange <> rkMultilineComment) then
   begin
@@ -502,18 +459,18 @@ begin
   inherited;
 end;
 
-procedure  TSynURQLSyn.ResetRange;
+procedure TSynURQLSyn.ResetRange;
 begin
   f_CurRange := rkGeneral;
   f_RangeToSet := rkNull;
 end;
 
-procedure  TSynURQLSyn.SetRange(Value: Pointer);
+procedure TSynURQLSyn.SetRange(Value: Pointer);
 begin
   f_CurRange := TRangeKind(Value);
 end;
 
-procedure  TSynURQLSyn.TP_Ampersand;
+procedure TSynURQLSyn.TP_Ampersand;
 begin
   f_CurToken := tkSymbol;
   inc(Run);
@@ -521,7 +478,7 @@ begin
   f_InDecoradd := False;
 end;
 
-procedure  TSynURQLSyn.TP_Comma(aChar: WideChar);
+procedure TSynURQLSyn.TP_Comma(aChar: WideChar);
 begin
   f_CurToken := tkSymbol;
   inc(Run);
@@ -537,7 +494,7 @@ begin
   end;
 end;
 
-procedure  TSynURQLSyn.TP_LineComment;
+procedure TSynURQLSyn.TP_LineComment;
 begin
   f_CurToken := tkComment;
   repeat
@@ -545,7 +502,7 @@ begin
   until IsLineEnd(Run);
 end;
 
-procedure  TSynURQLSyn.TP_Ident;
+procedure TSynURQLSyn.TP_Ident;
 var
   I: Integer;
   l_Start: Integer;
@@ -621,7 +578,7 @@ begin
   end;
 end;
 
-procedure  TSynURQLSyn.TP_Label;
+procedure TSynURQLSyn.TP_Label;
 begin
   inc(Run);
   if Run = 1 then
@@ -634,7 +591,7 @@ begin
     f_CurToken := tkSymbol;
 end;
 
-procedure  TSynURQLSyn.TP_Minus;
+procedure TSynURQLSyn.TP_Minus;
 begin
   f_CurToken := tkSymbol;
   inc(Run);
@@ -644,7 +601,7 @@ begin
   end;
 end;
 
-procedure  TSynURQLSyn.TP_MultilineComment;
+procedure TSynURQLSyn.TP_MultilineComment;
 begin
   f_CurToken := tkComment;
   repeat
@@ -662,7 +619,7 @@ begin
   until IsLineEnd(Run) or (f_RangeToSet <> rkNull);
 end;
 
-procedure  TSynURQLSyn.TP_Number;
+procedure TSynURQLSyn.TP_Number;
 var
   l_FirstZero: Integer;
   l_IsHex: Boolean;
@@ -690,8 +647,7 @@ begin
   l_IsHex := False;
   repeat
     inc(Run);
-    if (not IsLineEnd(Run)) and (fLine[Run] = 'x') and (Run = l_FirstZero + 1)
-    then
+    if (not IsLineEnd(Run)) and (fLine[Run] = 'x') and (Run = l_FirstZero + 1) then
     begin
       l_IsHex := True;
       inc(Run);
@@ -699,7 +655,7 @@ begin
   until (not IsNumberChar) or IsLineEnd(Run);
 end;
 
-procedure  TSynURQLSyn.TP_Slash;
+procedure TSynURQLSyn.TP_Slash;
 begin
   f_CurToken := tkSymbol;
   inc(Run);
@@ -711,7 +667,7 @@ begin
   end;
 end;
 
-procedure  TSynURQLSyn.TP_Space;
+procedure TSynURQLSyn.TP_Space;
 begin
   f_CurToken := tkSpace;
   repeat
@@ -719,7 +675,7 @@ begin
   until (fLine[Run] > #32) or IsLineEnd(Run);
 end;
 
-procedure  TSynURQLSyn.TP_SubEnd;
+procedure TSynURQLSyn.TP_SubEnd;
 begin
   if f_CurRange <> rkMultilineComment then
   begin
@@ -735,7 +691,7 @@ begin
   end;
 end;
 
-procedure  TSynURQLSyn.TP_SubStart;
+procedure TSynURQLSyn.TP_SubStart;
 begin
   if f_CurRange <> rkMultilineComment then
   begin
@@ -753,13 +709,13 @@ begin
   end;
 end;
 
-procedure  TSynURQLSyn.TP_Symbol;
+procedure TSynURQLSyn.TP_Symbol;
 begin
   inc(Run);
   f_CurToken := tkSymbol;
 end;
 
-procedure  TSynURQLSyn.TP_Unknown;
+procedure TSynURQLSyn.TP_Unknown;
 begin
   inc(Run);
   f_CurToken := tkUnknown;
